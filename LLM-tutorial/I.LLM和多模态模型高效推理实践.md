@@ -27,11 +27,11 @@
 
 LLM的推理流程：
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/2M9qPBxrVeWZl015/img/7c197455-9310-47cf-9ae7-6e69617e51b5.png)
+![image](resources/7c197455-9310-47cf-9ae7-6e69617e51b5.png)
 
 多模态的LLM的原理：
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/1GXn4XpbrGgGnDQ4/img/ba7d6465-e93d-495b-9ad7-6c468175548f.png)
+![image](resources/ba7d6465-e93d-495b-9ad7-6c468175548f.png)
 
 代码演示：
 
@@ -98,7 +98,7 @@ vLLM开源链接：https://github.com/vllm-project/vllm
 
 Xinference支持大语言模型，语音识别模型，多模态模型的部署，简化了部署流程，通过一行命令完成模型的部署工作。并支持众多前沿的大语言模型，结合GGML技术，支持多端部署。
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/ybEnBBdYMkMRnP13/img/da1ce618-9de9-42e2-82ee-0ee093ea4b66.png)
+![image](resources/da1ce618-9de9-42e2-82ee-0ee093ea4b66.png)
 
 **使用Qwen.cpp实现通义千问的多端部署：**
 
@@ -122,7 +122,7 @@ RAG 通过在语言模型生成答案之前，先从广泛的文档数据库中
 
 一个典型的RAG的例子：
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/8oLl9y9JQK8zlapY/img/f7985e33-9a2e-4b6d-a4be-87f60a369078.png)
+![image](resources/f7985e33-9a2e-4b6d-a4be-87f60a369078.png)
 
 这里面主要包括包括三个基本步骤：
 
@@ -134,6 +134,6 @@ RAG 通过在语言模型生成答案之前，先从广泛的文档数据库中
 
 **RAG（开卷考试）VS. Finetune（专业课程学习）**
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/8oLl9y9JQK8zlapY/img/b5c6a200-1943-4f09-8f86-478bf2ffa70a.png)
+![image](resources/b5c6a200-1943-4f09-8f86-478bf2ffa70a.png)
 
 示例代码：[https://github.com/modelscope/modelscope/blob/master/examples/pytorch/application/qwen\_doc\_search\_QA\_based\_on\_langchain\_llamaindex.ipynb](https://github.com/modelscope/modelscope/blob/master/examples/pytorch/application/qwen_doc_search_QA_based_on_langchain_llamaindex.ipynb)

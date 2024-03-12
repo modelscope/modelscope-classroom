@@ -28,7 +28,7 @@ LLM提供了一些参数可以影响输出结果的创造力和确定性。
 
 提示工程（Prompt Engineering）是一项通过优化提示词（Prompt）和生成策略，从而获得更好的模型返回结果的工程技术。总体而言，其实现逻辑如下：
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/QvjnAAa2g9DynXo5/img/f2ff219f-a539-4a8c-bd7d-63b73fa67510.png)
+![image](resources/f2ff219f-a539-4a8c-bd7d-63b73fa67510.png)
 
 （注：示例图来自Cohere官网）
 
@@ -75,9 +75,9 @@ System message也可以被用于规定LLM的答复范围，并设定具体的�
 | --- | --- | --- |
 |  教育  |  深度学习老师  |  你是一名深度学习的老师，可以回答深度学习领域相关的问题，提供有关机器学习概念、技术和最佳实践的全面信息。提供有关实施机器学习算法、选择适当的工具和框架以及构建端到端机器学习项目的分步指导。说明：1. 仅回答深度学习领域的知识 2. 如果不确定答案，你可以回答我不知道，并建议用户访问模型开源社区：www.modelscope.cn  |
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/QvjnAAa2g9DynXo5/img/cbff2729-261a-4d61-bc92-5c5acf6e2655.png)
+![image](resources/cbff2729-261a-4d61-bc92-5c5acf6e2655.png)
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/QvjnAAa2g9DynXo5/img/b055e8d5-c7e5-40c9-b9cc-33b274d156cb.png)
+![image](resources/b055e8d5-c7e5-40c9-b9cc-33b274d156cb.png)
 
 **注意：**即便我们在system message里面规范了模型回答，也不能保障请求一定会满足，但是好的system message设计可以增加特定结果的可能性，以及得到LLM更加符合要求的答复。
 

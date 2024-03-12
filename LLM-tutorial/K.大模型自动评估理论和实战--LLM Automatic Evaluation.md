@@ -51,7 +51,7 @@
 
 LLM评估的方法论
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/YdgOkxKZB8a2l4BX/img/527230d4-206d-4c62-806d-e50ff7547e33.png)
+![image](resources/527230d4-206d-4c62-806d-e50ff7547e33.png)
 
 **如何评估一个LLM**
 
@@ -76,7 +76,7 @@ LLM评估的方法论
     *   安全性（Safety）
         
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/996dfdf4-c222-4b9f-b9a0-a071ea49aef7.png)
+![image](resources/996dfdf4-c222-4b9f-b9a0-a071ea49aef7.png)
 
 > **例：GPT-4 vs LLaMA2-7B能力维度对比评测**
 
@@ -90,8 +90,8 @@ LLM评估的方法论
 |  **数据集**  |  **描述**  |  **评价指标**  |  **样例**  |
 | --- | --- | --- | --- |
 |  MMLU  |  MassiveMultitaskLanguageUnderstanding 一个多任务数据集，由各种学科的多项选择题组成。涵盖STEM、人文、社科等领域。包括57个子任务，包括初等数学、美国历史、计算机科学、法律等等。  |  Accuracy  |  Question: In 2016, about how many people in the United States were homeless? A. 55,000 B. 550,000 C. 5,500,000 D. 55,000,000 Answer: B  |
-|  TriviaQA  |  阅读理解数据集，包含超过65万个问题-答案-证据三元组。其包括95K个问答对，由冷知识爱好者提供 + 独立收集的事实性文档撰写  |  EM(ExactMatch) F1 (word-level)  |  ![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/3f700aa9-eadb-4921-93bf-a61d2361b53c.png) （问题-答案-证据文档）  |
-|  MATH  |   12500道数学题，每道包含step-by-step solution  |  Accuracy  |  ![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/9e268ef4-3547-4311-9bee-b81e6347ad65.png)  |
+|  TriviaQA  |  阅读理解数据集，包含超过65万个问题-答案-证据三元组。其包括95K个问答对，由冷知识爱好者提供 + 独立收集的事实性文档撰写  |  EM(ExactMatch) F1 (word-level)  |  ![image](resources/3f700aa9-eadb-4921-93bf-a61d2361b53c.png) （问题-答案-证据文档）  |
+|  MATH  |   12500道数学题，每道包含step-by-step solution  |  Accuracy  |  ![image](resources/9e268ef4-3547-4311-9bee-b81e6347ad65.png)  |
 |  HumanEval  |  HumanEval (Hand-Written Evaluation Set) 一个手写的问题解决数据集，要求根据给定的问题和代码模板，生成正确的代码片段。包含164个高质量的问题，涵盖五种编程语言：Python, C++, Java, Go, 和 JavaScript。  |  pass@k  |  {     "task\_id": "test/0",     "prompt": "def return1():\n",     "canonical\_solution": "    return 1",     "test": "def check(candidate):\n    assert candidate() == 1",     "entry\_point": "return1" }  |
 
 *   **Rule-based自动评测**
@@ -99,14 +99,14 @@ LLM评估的方法论
 
 > **基本流程**
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/a/ROw7nVZ4Ysw2yJKa/93ecb255d85f4fc1a8c16886a81694ed0521.png)
+![image](resources/93ecb255d85f4fc1a8c16886a81694ed0521.png)
 
 *   根据数据集原始question来构建prompt
     
 
 > **示例(few-shot)**
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/45fa0dbc-5f72-443c-919a-f0e7a1edb48b.png)
+![image](resources/45fa0dbc-5f72-443c-919a-f0e7a1edb48b.png)
 
 > **示例：few-shot with CoT**
 
@@ -214,7 +214,7 @@ LLM评估的方法论
 *   **Model-based自动评测**
     
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/YdgOkxKZB8a2l4BX/img/70f6ea12-f36f-4f58-b62e-cf6d28edcfd0.png)
+![image](resources/70f6ea12-f36f-4f58-b62e-cf6d28edcfd0.png)
 
 *   中心化评测
     
@@ -241,22 +241,22 @@ LLM评估的方法论
     *   **（Battle count of each combination of models,  from LMSYS）**
         
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/f2e4ef13-dc80-4b09-a8ba-49f2823794b5.png)
+![image](resources/f2e4ef13-dc80-4b09-a8ba-49f2823794b5.png)
 
 *   **（Fraction of Model A wins for all non-tied A vs. B battles,  from LMSYS）**
     
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/7d2fa017-b4fd-49c0-b69d-6e5fd286efce.png)
+![image](resources/7d2fa017-b4fd-49c0-b69d-6e5fd286efce.png)
 
 *   **LLM指令攻防**
     
     *   指令诱导  (诱导模型输出目标答案，from SuperCLUE)
         
-    *   ![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/57149682-203e-47ec-acda-95253cd54f1a.png)
+    *   ![image](resources/57149682-203e-47ec-acda-95253cd54f1a.png)
         
     *   有害指令注入 (将真实有害意图注入到prompt中, from SuperCLUE)
         
-    *   ![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/b79d3cf9-b60b-43ba-8d7b-a9b4cc070e6b.png)
+    *   ![image](resources/b79d3cf9-b60b-43ba-8d7b-a9b4cc070e6b.png)
         
 
 #### 2.2 模型性能评估
@@ -293,9 +293,9 @@ LLM评估的方法论
 
 > **解决思路： 动态数据集**
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/YdgOkxKZB8a2l4BX/img/e1fc58a1-b555-43e7-9ecb-4e4ad013fd9e.png)
+![image](resources/e1fc58a1-b555-43e7-9ecb-4e4ad013fd9e.png)
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/YdgOkxKZB8a2l4BX/img/03654212-614b-4dc3-a9c1-6513f6da4294.png)
+![image](resources/03654212-614b-4dc3-a9c1-6513f6da4294.png)
 
 2.  **裁判员模型的能力上限**
     
@@ -402,7 +402,7 @@ Pairwise mode，待测LLM两两组合进行对弈
 
 [请至钉钉文档查看附件《6.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrklgm7on9my652lw4&utm_scene=team_space)
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/d63351fd-409d-4d77-975a-8ab7890d383d.png)
+![image](resources/d63351fd-409d-4d77-975a-8ab7890d383d.png)
 
 6.  **效果评测报告**
     
@@ -414,18 +414,18 @@ Pairwise mode，待测LLM两两组合进行对弈
 
 *   **报告可视化**
     
-*   ![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/oeLbnjejLkwYlaNY/img/a569b578-501d-414e-aeaa-53ce07d8d214.png)
+*   ![image](resources/a569b578-501d-414e-aeaa-53ce07d8d214.png)
     
 *   **Leaderboard:**  [https://modelscope.cn/leaderboard/58/ranking?type=free](https://modelscope.cn/leaderboard/58/ranking?type=free)
     
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/cff2b99b-2c8c-4200-aa5d-8758d018d24d.png)
+![image](resources/cff2b99b-2c8c-4200-aa5d-8758d018d24d.png)
 
 7.  **模型性能评测（Perf Eval）**
     
 
 > **性能评测报告示例**
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/15eb7f88-9b7c-470d-a789-83ff0e133851.png)
+![image](resources/15eb7f88-9b7c-470d-a789-83ff0e133851.png)
 
-![image](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/yBRq1M5ZMPZ4qdv1/img/464fd064-55de-402c-aac8-a8320a94227b.png)
+![image](resources/464fd064-55de-402c-aac8-a8320a94227b.png)
