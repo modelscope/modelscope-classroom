@@ -8,6 +8,7 @@
 
 # 🌿更新日志
 
+- ⭐️2024.03.12 补全LLM大模型系列教程，请查看[LLM-tutorial](./LLM-tutorial).
 - ⭐️2024.03.06 增加了SD-AIGC（文生图、文生视频）的系列教程和Demo，请查看[AIGC-tutorial](./AIGC-tutorial).
   - 提供了Sora文生视频相关技术的DEMO，如DiT、ViViT等.
   - 提供了[Diffusion扩散技术的教程](./AIGC-tutorial/基于Transformers，diffusion技术解析+实战.md).
