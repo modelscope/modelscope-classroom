@@ -8,6 +8,7 @@
 
 # 🌿更新日志
 
+- ⭐️2024.04.12 新增基于modelscope-agent的Agentfabric的训练教程，即魔搭社区版本的 OPENAI Store [AgentFabric](./LLM-tutorial/Modelscope-Agent:%20AgentFabric微调最佳实践.md).
 - ⭐️2024.03.12 补全LLM大模型系列教程，请查看[LLM-tutorial](./LLM-tutorial).
 - ⭐️2024.03.06 增加了SD-AIGC（文生图、文生视频）的系列教程和Demo，请查看[AIGC-tutorial](./AIGC-tutorial).
   - 提供了Sora文生视频相关技术的DEMO，如DiT、ViViT等.
