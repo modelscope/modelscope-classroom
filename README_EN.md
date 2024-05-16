@@ -6,6 +6,8 @@ Here we have gathered the deep learning tutorials from the MoDao community! Deve
 
 # 🌿 Update Log
 
+- ⭐️2024.05.16 Add quantization technical analysis, check:[LLM-tutorial](./LLM-tutorial/量化技术解析.md).
+- ⭐️2024.05.16 Add LISA technical analysis, check:[LLM-tutorial](./LLM-tutorial/LISA微调技术解析.md).
 - ⭐️2024.04.12 Add modelscope-agent: agentfabric（An opensource OPENAI store） finetuning tutorials，please check [AgentFabric](./LLM-tutorial/Modelscope-Agent:%20AgentFabric微调最佳实践.md).
 - ⭐️2024.03.12 Update the LLM tutorials，please check [LLM-tutorial](./LLM-tutorial).
 - ⭐️ 2024.03.06 Added a series of tutorials and demos for SD-AIGC (text-to-image, text-to-video), please check [AIGC-tutorial](./AIGC-tutorial).
