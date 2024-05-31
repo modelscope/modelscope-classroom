@@ -379,6 +379,7 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
 Single mode，使用专家模型（GPT-4）对待测LLM进行打分
 
     # Example
+    # Note: dry-run模式 (模型answer正常生成，但专家模型，如GPT-4，不会被触发，评估结果会随机生成，如需正式评测，请去掉--dry-run参数)
     python llmuses/run_arena.py --c registry/config/cfg_single.yaml --dry-run
 
 [请至钉钉文档查看附件《4.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkkz502wy86kerhzee&utm_scene=team_space)
@@ -389,7 +390,8 @@ Single mode，使用专家模型（GPT-4）对待测LLM进行打分
 Baseline mode，选定baseline模型，其它待测LLM与该模型进行对比
 
     # Example
-    python llmuses/run_arena.py --dry-run --c registry/config/cfg_pairwise_baseline.yaml
+    # Note: dry-run模式 (模型answer正常生成，但专家模型，如GPT-4，不会被触发，评估结果会随机生成，如需正式评测，请去掉--dry-run参数)
+    python llmuses/run_arena.py --c registry/config/cfg_pairwise_baseline.yaml --dry-run
 
 [请至钉钉文档查看附件《5.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkldvk7cua7s9e4qfr&utm_scene=team_space)
 
@@ -398,6 +400,8 @@ Baseline mode，选定baseline模型，其它待测LLM与该模型进行对比
 
 Pairwise mode，待测LLM两两组合进行对弈
 
+    # Example
+    # Note: dry-run模式 (模型answer正常生成，但专家模型，如GPT-4，不会被触发，评估结果会随机生成，如需正式评测，请去掉--dry-run参数)
     python llmuses/run_arena.py -c registry/config/cfg_arena.yaml --dry-run
 
 [请至钉钉文档查看附件《6.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrklgm7on9my652lw4&utm_scene=team_space)
