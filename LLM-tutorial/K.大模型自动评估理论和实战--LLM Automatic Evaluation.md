@@ -346,13 +346,15 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
     
 
     # 指定模型和数据集
-    python llmuses/run.py --model ZhipuAI/chatglm3-6b --datasets ceval --outputs ./outputs/test --limit 10
+    python llmuses/run.py --model ZhipuAI/chatglm3-6b --template-type chatglm3 --datasets ceval --outputs ./outputs/test --limit 10
 
 *   \--model: ModelScope模型id， ([https://modelscope.cn/models/ZhipuAI/chatglm3-6b/summary](https://modelscope.cn/models/ZhipuAI/chatglm3-6b/summary)) ，也可以是模型的本地路径
     
 *   \--datasets: 数据集的id
     
 *   \--limit: （每个sub-task）最大评测样本数
+
+*   \--template-type: 模型的template-type，如chatglm3、qwen等
     
 
 [请至钉钉文档查看附件《1.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkkwbr9bvf1opazpdn&utm_scene=team_space)
@@ -360,7 +362,7 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
 2.  **带参数评测**
     
 
-    python llmuses/run.py --model ZhipuAI/chatglm3-6b --outputs ./outputs/test2 --model-args revision=v1.0.2,precision=torch.float16,device_map=auto --datasets arc --limit 10
+    python llmuses/run.py --model ZhipuAI/chatglm3-6b --template-type chatglm3 --outputs ./outputs/test2 --model-args revision=v1.0.2,precision=torch.float16,device_map=auto --datasets arc --limit 10
 
 *    \--model-args: 模型参数，以逗号分隔，key=value形式
     
@@ -369,6 +371,8 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
 *   \--mem-cache: 是否使用内存缓存，若开启，则已经跑过的数据会自动缓存，并持久化到本地磁盘
     
 *   \--limit: 每个subset最大评估数据量
+
+*   \--template-type: 模型的template-type，如chatglm3、qwen等
     
 
 [请至钉钉文档查看附件《2.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkkwu0yqcmz8sh8u8r&utm_scene=team_space)
