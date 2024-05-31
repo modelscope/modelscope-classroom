@@ -346,13 +346,15 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
     
 
     # 指定模型和数据集
-    python llmuses/run.py --model ZhipuAI/chatglm3-6b --datasets ceval --outputs ./outputs/test --limit 10
+    python llmuses/run.py --model ZhipuAI/chatglm3-6b --template-type chatglm3 --datasets ceval --outputs ./outputs/test --limit 10
 
 *   \--model: ModelScope模型id， ([https://modelscope.cn/models/ZhipuAI/chatglm3-6b/summary](https://modelscope.cn/models/ZhipuAI/chatglm3-6b/summary)) ，也可以是模型的本地路径
     
 *   \--datasets: 数据集的id
     
 *   \--limit: （每个sub-task）最大评测样本数
+
+*   \--template-type: 模型的template-type，如chatglm3、qwen等
     
 
 [请至钉钉文档查看附件《1.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkkwbr9bvf1opazpdn&utm_scene=team_space)
@@ -360,7 +362,7 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
 2.  **带参数评测**
     
 
-    python llmuses/run.py --model ZhipuAI/chatglm3-6b --outputs ./outputs/test2 --model-args revision=v1.0.2,precision=torch.float16,device_map=auto --datasets arc --limit 10
+    python llmuses/run.py --model ZhipuAI/chatglm3-6b --template-type chatglm3 --outputs ./outputs/test2 --model-args revision=v1.0.2,precision=torch.float16,device_map=auto --datasets arc --limit 10
 
 *    \--model-args: 模型参数，以逗号分隔，key=value形式
     
@@ -369,6 +371,8 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
 *   \--mem-cache: 是否使用内存缓存，若开启，则已经跑过的数据会自动缓存，并持久化到本地磁盘
     
 *   \--limit: 每个subset最大评估数据量
+
+*   \--template-type: 模型的template-type，如chatglm3、qwen等
     
 
 [请至钉钉文档查看附件《2.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkkwu0yqcmz8sh8u8r&utm_scene=team_space)
@@ -379,6 +383,7 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
 Single mode，使用专家模型（GPT-4）对待测LLM进行打分
 
     # Example
+    # Note: dry-run模式 (模型answer正常生成，但专家模型，如GPT-4，不会被触发，评估结果会随机生成，如需正式评测，请去掉--dry-run参数)
     python llmuses/run_arena.py --c registry/config/cfg_single.yaml --dry-run
 
 [请至钉钉文档查看附件《4.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkkz502wy86kerhzee&utm_scene=team_space)
@@ -389,7 +394,8 @@ Single mode，使用专家模型（GPT-4）对待测LLM进行打分
 Baseline mode，选定baseline模型，其它待测LLM与该模型进行对比
 
     # Example
-    python llmuses/run_arena.py --dry-run --c registry/config/cfg_pairwise_baseline.yaml
+    # Note: dry-run模式 (模型answer正常生成，但专家模型，如GPT-4，不会被触发，评估结果会随机生成，如需正式评测，请去掉--dry-run参数)
+    python llmuses/run_arena.py --c registry/config/cfg_pairwise_baseline.yaml --dry-run
 
 [请至钉钉文档查看附件《5.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrkldvk7cua7s9e4qfr&utm_scene=team_space)
 
@@ -398,6 +404,8 @@ Baseline mode，选定baseline模型，其它待测LLM与该模型进行对比
 
 Pairwise mode，待测LLM两两组合进行对弈
 
+    # Example
+    # Note: dry-run模式 (模型answer正常生成，但专家模型，如GPT-4，不会被触发，评估结果会随机生成，如需正式评测，请去掉--dry-run参数)
     python llmuses/run_arena.py -c registry/config/cfg_arena.yaml --dry-run
 
 [请至钉钉文档查看附件《6.mp4》](https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7Jnxop15OCBQErPgbW2LD0oRE?iframeQuery=anchorId%253DX02lrklgm7on9my652lw4&utm_scene=team_space)
