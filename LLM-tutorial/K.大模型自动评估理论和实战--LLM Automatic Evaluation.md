@@ -309,9 +309,9 @@ LLM评估的方法论
 
 LLM评估实战
 
-LLMuses框架--轻量化、端到端的大模型自动评估框架
+Eval-Scope框架--轻量化、端到端的大模型自动评估框架
 
-GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/llmuses)
+GitHub: [https://github.com/modelscope/eval-scope](https://github.com/modelscope/eval-scope)
 
 > **框架特性**
 
@@ -335,10 +335,10 @@ GitHub: [https://github.com/modelscope/llmuses](https://github.com/modelscope/l
 **环境安装**
 
     # 1. 代码下载
-    git clone git@github.com:modelscope/llmuses.git
+    git clone git@github.com:modelscope/eval-scope.git
     
     # 2. 安装依赖
-    cd llmuses/
+    cd eval-scope/
     pip install -r requirements/requirements.txt
     pip install -e .
 
