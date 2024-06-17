@@ -1,3 +1,5 @@
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
 # 人类偏好对齐训练
 
 ## 目录
@@ -50,9 +52,8 @@
 数据集D由模型输入prompt，以及希望模型输出的回答response组成，分别用符号 $\mathbf{x}$ , $\mathbf{y}$ 表示
 用$\pi_\theta$表示模型，设 $\mathbf{y}$ 的长度为 $T$ ，当给定prompt $\mathbf{x}$ , 模型产生reponse $\mathbf{y}$ 的概率可以表示为
 
-$$
-\pi_{\theta}(\mathbf{y}\mid \mathbf{x}) = \left[ \prod_{t=1}^{T} \pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1}) \right]
-$$
+$$\pi_{\theta}(\mathbf{y}\mid \mathbf{x}) = \left[ \prod_{t=1}^{T} \pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1}) \right]$$
+
 其中 $\pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1})$ 表示给定第t个token前的输入，模型输出第t个token的概率
 
 SFT阶段使用以下损失训练模型
