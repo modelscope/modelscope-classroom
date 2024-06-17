@@ -1,8 +1,5 @@
-<div>
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
-</div>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
 
 # 人类偏好对齐训练
 
@@ -62,7 +59,9 @@ $$\pi_{\theta}(\mathbf{y}\mid \mathbf{x}) = \left[ \prod_{t=1}^{T} \pi_{\theta} 
 
 SFT阶段使用以下损失训练模型
 
-$$\mathcal{L}_{\text{SFT}} =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \log\pi_\theta(\mathbf{y}\mid \mathbf{x})\right] =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \sum_{t=1}^{T} \log \pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1}) \right]$$
+
+$$\mathcal{L}_{{\text{SFT}}} =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \log\pi_\theta(\mathbf{y}\mid \mathbf{x})\right] =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \sum_{t=1}^{T} \log \pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1}) \right]$$
+
 
 简单起见，我们将这一阶段训练后的模型称为SFT模型
 
@@ -200,7 +199,8 @@ $$\max_{\pi_{\theta}} J_{r_\phi}(\pi_\theta) = \mathbb{E}_{\mathbf{x} \sim D, \m
 
 $$\pi^\star(\mathbf y \mid \mathbf x) = \frac{1}{Z(\mathbf x)} \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right).$$
 
-其中配分函数 $Z(\mathbf x)=\prod_\mathbf y  \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right)$.
+其中配分函数 $Z(\mathbf{x})=\prod_{\mathbf{y}} \pi_{\text{ref}}(\mathbf{y} \mid \mathbf{x}) \exp\left(\frac{1}{\beta} r(\mathbf{x}, \mathbf{y})\right)$.
+
 
 而实际上即使我们能用奖励模型 $r_\phi$ 去近似 $r$ ，仍然很难计算 $Z(\mathbf x)$ ,然而我们可以通过上述式子得到 真实奖励函数的关于最优策略 $\pi^\star$ 的表达式
 
@@ -264,14 +264,16 @@ KTO引入了前景理论（prospect theory），该理论解释了为什么人�
 
 前景理论中，Tversky & Kahneman 用以下效用方程建模了人类价值
 
-$$v(z, z_{\text{ref}};\alpha, \lambda) = \left\{
-        \begin{array}{ll}
-            (z - z_{\text{ref}})^{\alpha} & \quad if \ z \geq z_{\text{ref}} \\
-            -\lambda(z_{\text{ref}} - z)^{\alpha} & \quad if \ z < z_{\text{ref}}
-        \end{array}
-    \right.$$
+$$
+v(z, z_{\text{ref}};\alpha, \lambda) = \left\{
+    \begin{array}{ll}
+        (z - z_{\text{ref}})^{\alpha} & \quad \text{if } z \geq z_{\text{ref}} \\
+        -\lambda(z_{\text{ref}} - z)^{\alpha} & \quad \text{if } z < z_{\text{ref}}
+    \end{array}
+\right.
+$$
 
-价值函数 $v:z \to \R$ 将一个输出 $z$ 相对一个参考值 $z_{\text{ref}}$ 映射到其感知(或者说主观)价值，反应了人类相比起相同大小回报，对损失的敏感性更大
+价值函数 $v:z \to \mathbb{R}$ 将一个输出 $z$ 相对一个参考值 $z_{\text{ref}}$ 映射到其感知(或者说主观)价值，反应了人类相比起相同大小回报，对损失的敏感性更大
 
 其中超参 $\alpha$ 控制价值变化的速度，$\lambda$ 反应对损失的敏感程度
 
@@ -284,29 +286,29 @@ $$\mathcal{L}_{\text{KTO}}(\pi_{\theta}, \pi_{\text{ref}}) = \mathbb{E}_{x,y \si
 
 其中
 
-$$\begin{aligned}
+\begin{aligned}
 r_{\text{KTO}}(x, y) &= \beta \log \frac{\pi_{\theta}(y|x)}{\pi_{\text{ref}}(y|x)} \\
 
-z_{\text{ref}} &= \mathbb{E}_{x' \sim \mathcal{D}} \left[ \beta {\text{KL}}\left(\pi_{\theta}(y'|x') || \pi_{\text{ref}}(y'|x')\right) \right]\\
+z_{\text{ref}} &= \mathbb{E}_{x' \sim \mathcal{D}} \left[ \beta \text{KL}\left(\pi_{\theta}(y'|x') \|\pi_{\text{ref}}(y'|x')\right) \right]\\
 
 v_{\text{KTO}}(x) &= \left\{
     \begin{array}{ll}
-        \sigma\left( r_{\text{KTO}}(x, y) - {z}_{\text{ref}} \right) & \text{if } y \sim y_{\text{desirable }}| x \\
-        \sigma\left({z}_{\text{ref}} - r_{\text{KTO}}(x, y) \right) & \text{if } y \sim y_{\text{undesirable }}| x
+        \sigma\left( r_{\text{KTO}}(x, y) - z_{\text{ref}} \right) & \text{if } y \sim y_{\text{desirable }} \mid x \\
+        \sigma\left( z_{\text{ref}} - r_{\text{KTO}}(x, y) \right) & \text{if } y \sim y_{\text{undesirable }} \mid x
     \end{array}
 \right.\\
 
 w(y) &= \left\{
     \begin{array}{ll}
-        \lambda_{D} & \text{if } y \sim y_{\text{desirable }}| x \\
-        \lambda_{U} & \text{if } y \sim y_{\text{undesirable }}| x
+        \lambda_{D} & \text{if } y \sim y_{\text{desirable }} \mid x \\
+        \lambda_{U} & \text{if } y \sim y_{\text{undesirable }} \mid x
     \end{array}
 \right.
+\end{aligned}
 
-\end{aligned}$$
 
 我们一步步理解这个损失函数
-- $y \sim y_{\text{desirable }}| x和y \sim y_{\text{undesirable }}| x$ 分别表示标签值为true/false的回答，对应了效用方程中高于/低于参考点的输出值z
+- $y \sim y_{\text{desirable }}| x$ 和 $y \sim y_{\text{undesirable }}| x$ 分别表示标签值为true/false的回答，对应了效用方程中高于/低于参考点的输出值z
 - $v_{\text{KTO}}$ 直接来自于效用方程, 用DPO的隐含奖励项 $\beta \log \frac{\pi_{\theta}(y|x)}{\pi_{\text{ref}}(y|x)}$ 作为效用方程的输入值 $z$，用 $\sigma$ 函数代替指数 $\alpha$。
 - 对于效用方程中的超参 $\lambda$, 作者拆为两个超参 $\lambda_D$ 和 $\lambda_U$，分别控制两种回答对应的损失权重
 
