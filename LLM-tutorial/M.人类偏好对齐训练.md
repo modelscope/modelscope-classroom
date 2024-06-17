@@ -49,12 +49,14 @@
 **第一阶段 SFT训练**
 数据集D由模型输入prompt，以及希望模型输出的回答response组成，分别用符号 $\mathbf{x}$ , $\mathbf{y}$ 表示
 用$\pi_\theta$表示模型，设 $\mathbf{y}$ 的长度为 $T$ ，当给定prompt $\mathbf{x}$ , 模型产生reponse $\mathbf{y}$ 的概率可以表示为
+
 $$
 \pi_{\theta}(\mathbf{y}\mid \mathbf{x}) = \left[ \prod_{t=1}^{T} \pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1}) \right]
 $$
 其中 $\pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1})$ 表示给定第t个token前的输入，模型输出第t个token的概率
 
 SFT阶段使用以下损失训练模型
+
 $$
 \mathcal{L}_{\text{SFT}} =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \log\pi_\theta(\mathbf{y}\mid \mathbf{x})\right] =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \sum_{t=1}^{T} \log \pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1}) \right]
 $$
@@ -120,6 +122,7 @@ $A^{\pi}(s, a) = Q^{\pi}(s, a) - V^{\pi}(s)$
 
 PPO 算法是基于策略的方法中的一种，它结合了策略梯度方法和信赖域优化的优点，通过限制每次策略更新的步长，保持新策略与旧策略的接近程度，以避免策略更新过大带来的不稳定性和性能下降。
 PPO算法的损失函数如下
+
 $$
 \mathcal{L}^{\text{CLIP}}(\theta) = \mathbb{E}_{t} \left[ \min \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)} \hat{A}_t(a_t\mid s_t), \text{clip} \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}, 1 - \epsilon, 1 + \epsilon \right) \hat{A}_t(a_t\mid s_t) \right) \right]
 $$
@@ -132,6 +135,7 @@ $\pi_{\theta}$ 是当前策略，$\pi_{\theta_{\text{old}}}$ 是旧策略，$\ha
 得到奖励模型后，我们相当于得到了近似的奖励函数。将模型视为强化学习问题中的策略，模型的输入和输出分别可以看作是强化学习的状态和动作，我们可以使用强化学习算法对模型进行训练，可以简单理解为训练模型输出奖励最高的回答。
 
 目标函数可以写为
+
 $$
 J_{r_\phi}(\pi_\theta) = \mathbb{E}_{\mathbf{x} \sim D, \mathbf{y} \sim \pi_\theta} \left[ r_\phi(\mathbf{x}, \mathbf{y})\right]
 $$
@@ -139,16 +143,19 @@ $$
 
 然而强化学习训练过程非常不稳定，为此论文中采取了多项措施来缓解这一点。
 第一，将SFT模型作为参考模型，用 $\pi_\text{ref}$ 表示。在目标函数中加入与参考模型的KL散度正则项来限制模型的更新幅度，
+
 $$
 J_{r_\phi}(\pi_\theta) = \mathbb{E}_{\mathbf{x} \sim D, \mathbf{y} \sim \pi_\theta} \left[ r_\phi(\mathbf{x}, \mathbf{y})\right]-\beta D_{KL}(\pi_\theta(\mathbf{y}\mid\mathbf{x})\|\pi_{\text{ref}}(\mathbf{y}\mid\mathbf{x}))
 $$
 其中超参 $\beta$ 控制与参考模型的偏离程度
 
 根据目标函数，展开KL散度项，最后的综合奖励可以写为
+
 $$
 r(\mathbf{x},\mathbf{y})=r_{\phi}(\mathbf{x},\mathbf{y})-\beta(\log\pi_\theta(\mathbf{y}\mid\mathbf{x})-\log\pi_\text{ref}(\mathbf{y}\mid\mathbf{x}))
 $$
 目标函数写为
+
 $$
 J_{r_\phi}(\pi_\theta) = \mathbb{E}_{\mathbf{x} \sim D, \mathbf{y} \sim \pi_\theta} \left[ r(\mathbf{x}, \mathbf{y})\right]
 $$
@@ -177,22 +184,26 @@ PPO 算法本身通过限制每次策略更新的步长，保持新策略与旧�
 (对数学推导不感兴趣的同学可以直接看训练部分)
 
 Bradley-Terry (BT) 偏好模型认为人类的偏好分布可以用以下式子表示
+
 $$
 \mathbb{P}_\phi (\mathbf{y}_w \succ \mathbf{y}_l \mid \mathbf{x}) = \frac{\exp \left( r_\phi (\mathbf{x}, \mathbf{y}_w) \right)}{\exp \left( r_\phi (\mathbf{x}, \mathbf{y}_w) \right) + \exp \left( r_\phi (\mathbf{x}, \mathbf{y}_l) \right)} = \sigma \left( r_\phi (\mathbf{x}, \mathbf{y}_w) - r_\phi (\mathbf{x}, \mathbf{y}_l) \right)
 $$
 表示了人类的偏好是由隐含的奖励模型 $r_\phi$ 所产生
 
 而RLHF中的奖励建模阶段的损失函数 
+
 $$
 \mathcal{L}_R (r_\phi) = -\mathbb{E}_{(\mathbf{x}, \mathbf{y}_w, \mathbf{y}_l) \sim \mathcal{D}} \left[ \log \sigma (r_\phi (\mathbf{x}, \mathbf{y}_w) - r_\phi (\mathbf{x}, \mathbf{y}_l)) \right]
 $$
 可以认为是在给定 $(\mathbf{x},\mathbf{y}_w,\mathbf{y}_l)$ 数据下，极大似然估计BT偏好模型
 
 而对于RLHF强化学习阶段的目标
+
 $$
 \max_{\pi_{\theta}} J_{r_\phi}(\pi_\theta) = \mathbb{E}_{\mathbf{x} \sim D, \mathbf{y} \sim \pi_\theta} \left[ r_\phi(\mathbf{x}, \mathbf{y})\right]-\beta D_{KL}(\pi_\theta(\mathbf{y}\mid\mathbf{x})\|\pi_{\text{ref}}(\mathbf{y}\mid\mathbf{x}))
 $$
 其实存在闭式解，用r表示真正的奖励函数，那么闭式解等于
+
 $$
 \pi^\star(\mathbf y \mid \mathbf x) = \frac{1}{Z(\mathbf x)} \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right).
 $$
@@ -212,6 +223,7 @@ p^*(\mathbf{y}_1 \succ \mathbf{y}_2 \mid \mathbf{x}) = \frac{1}{1 + \exp \left( 
 $$
 
 类似于RLHF中的奖励建模阶段，我们用最大似然估计得到DPO的损失函数
+
 $$
 \mathcal{L}_{\text{DPO}}(\pi_\theta; \pi_{\text{ref}}) = -\mathbb{E}_{(\mathbf{x}, \mathbf{y}_w, \mathbf{y}_l) \sim \mathcal{D}} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(\mathbf{y}_w \mid \mathbf{x})}{\pi_{\text{ref}}(\mathbf{y}_w \mid \mathbf{x})} - \beta \log \frac{\pi_\theta(\mathbf{y}_l \mid \mathbf{x})}{\pi_{\text{ref}}(\mathbf{y}_l \mid \mathbf{x})} \right) \right]
 $$
@@ -244,11 +256,13 @@ $$
 CPO论文指出在翻译任务中，SFT的损失函数只会让模型回答尽可能接近数据集中的回答，受限于数据集的质量。而且SFT缺乏训练模型不产生（拒绝）错误回答的机制。因此，作者提出了一个新的训练目标来指导模型优先生成更高质量的翻译并拒绝较差的翻译。
 
 CPO基于DPO的损失函数做简化，将ref model简化为均匀分布 $U$ ，损失函数先简化为
+
 $$
 \mathcal{L}(\pi_\theta ; U) = -\mathbb{E}_{(\mathbf{x}, \mathbf{y}_w, \mathbf{y}_l) \sim \mathcal{D}} [ \log \sigma ( \beta \log \pi_\theta (\mathbf{y}_w \mid \mathbf{x})- \beta \log \pi_\theta (\mathbf{y}_l \mid \mathbf{x} )]
 $$
 
 并加入SFT损失项作为正则化项，最终的CPO loss可以写为
+
 $$
 \mathcal{L}_{\text{CPO}}=\mathcal{L}(\pi_\theta ; U)-\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}}[\log\pi_{\theta}(y_w\mid x)].
 $$
@@ -269,6 +283,7 @@ KTO引入了前景理论（prospect theory），该理论解释了为什么人�
 前景理论(prospect theory)
 
 前景理论中，Tversky & Kahneman 用以下效用方程建模了人类价值
+
 $$
 v(z, z_{\text{ref}};\alpha, \lambda) = \left\{
         \begin{array}{ll}
@@ -286,11 +301,13 @@ KTO loss
 与DPO和RLHF相比，KTO不需要为每个提示（prompt）配对提供偏好回答和拒绝回答。它仅需要一个答案，并利用一个标签值（true/false）来指示该答案的质量是正面的还是负面的（对应效用方程中大于/小于参考值）。KTO不要求偏好回答的数量与拒绝回答的数据相同，简化了数据的准备流程
 
 作者对Tversky & Kahneman的效用方程做了一定的修改，使其更适合模型训练，损失函数如下
+
 $$
 \mathcal{L}_{\text{KTO}}(\pi_{\theta}, \pi_{\text{ref}}) = \mathbb{E}_{x,y \sim \mathcal{D}}[w(y)(1-v_{\text{KTO}}(x,y;\beta))]
 $$
 
 其中
+
 $$
 \begin{aligned}
 r_{\text{KTO}}(x, y) &= \beta \log \frac{\pi_{\theta}(y|x)}{\pi_{\text{ref}}(y|x)} \\
@@ -313,6 +330,7 @@ w(y) &= \left\{
 
 \end{aligned}
 $$
+
 我们一步步理解这个损失函数
 - $y \sim y_{\text{desirable }}| x和y \sim y_{\text{undesirable }}| x$ 分别表示标签值为true/false的回答，对应了效用方程中高于/低于参考点的输出值z
 - $v_{\text{KTO}}$ 直接来自于效用方程, 用DPO的隐含奖励项 $\beta \log \frac{\pi_{\theta}(y|x)}{\pi_{\text{ref}}(y|x)}$ 作为效用方程的输入值 $z$，用 $\sigma$ 函数代替指数 $\alpha$。
@@ -337,16 +355,19 @@ $$
 ORPO的论文分析了为什么传统的人类指令对齐方法需要在SFT之后再进行指令执行训练：SFT训练的交叉熵损失函数仅会增加标签对应的token的概率，而不会降低生成不期望回答的概率。作者通过一个简单实验来展示这一点，使用HH-RLHF数据集的偏好回答对OPT-350M模型进行SFT训练，结果发现模型生成偏好回答和拒绝回答的概率都会随之增高。
 
 受此启发，作者在传统的SFT损失函数中加入了一项Odd Ratio损失，具体来说
+
 $$
 {\mathbf{\text{odds}}}_\theta(\mathbf{y}\mid \mathbf{x}) = \frac{P_\theta(\mathbf{y}\mid \mathbf{x})}{1-P_\theta(\mathbf{y}\mid \mathbf{x})}
 $$
 
 表示模型给定输入 $\mathbf{x}$ ,生成回答 $\mathbf{y}$ 相比不生成的概率比
+
 $$
 \text{OR}_\theta(\mathbf{y}_w,\mathbf{y}_l)=\frac{{\mathbf{\text{odds}}}_\theta(\mathbf{y}_w\mid \mathbf{x}) }{{\mathbf{\text{odds}}}_\theta(\mathbf{y}_l\mid \mathbf{x}) }
 $$
 
 最终的ORPO损失函数为
+
 $$
 \mathcal{L}_{\text{ORPO}}=\mathbb{E}_{\mathbf{x},\mathbf{y}_w,\mathbf{y}_l}[\mathcal{L}_{\text{SFT}}-\lambda\log \sigma(\log\text{OR}_\theta(\mathbf{y}_w,\mathbf{y}_l))]
 $$
@@ -364,11 +385,13 @@ $$
 $$
 
 并取序列平均生成概率作为隐含奖励，即作长度正则
+
 $$
 \mathcal{L}(\pi_\theta ; U) = -\mathbb{E}_{(\mathbf{x}, \mathbf{y}_w, \mathbf{y}_l) \sim \mathcal{D}} [ \log \sigma ( \beta \frac{\log \pi_\theta (\mathbf{y}_w \mid \mathbf{x})}{|\mathbf{y}_w|}- \beta \frac{\log \pi_\theta (\mathbf{y}_l \mid \mathbf{x} )}{|\mathbf{y}_l|})]
 $$
 
 并加入了reward margin项 $\gamma$ 来扩大两个隐含奖励的差距,得到SimPO的损失函数
+
 $$
 \mathcal{L}_{\text{SimPO}}= -\mathbb{E}_{(\mathbf{x}, \mathbf{y}_w, \mathbf{y}_l) \sim \mathcal{D}} [ \log \sigma ( \beta \frac{\log \pi_\theta (\mathbf{y}_w \mid \mathbf{x})}{|\mathbf{y}_w|}- \beta \frac{\log \pi_\theta (\mathbf{y}_l \mid \mathbf{x} )}{|\mathbf{y}_l|}-\gamma)]
 $$
@@ -393,9 +416,11 @@ $$
 
 **如何选择人类偏好对齐训练还是SFT？**
 从SFT的损失函数
+
 $$
 \mathcal{L}_{\text{SFT}} =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \log\pi_\theta(\mathbf{y}\mid \mathbf{x})\right] =- \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \mathcal{D}} \left[ \sum_{t=1}^{T} \log \pi_{\theta} (y_t | \mathbf{x}, \mathbf{y}_{1:t-1}) \right]
 $$
+
 可以看出SFT训练强调让模型模仿数据集中的回答，扩大相应的生成概率。
 
 而人类偏好对齐训练额外考虑了如何降低模型生成我们不希望回答的概率，通过拒绝回答提供额外的监督信号
@@ -426,11 +451,13 @@ $$
 **rewards**(rewards/chosen/rewards/rejected)
 
 对应RLHF中的显式奖励模型的奖励值或DPO系算法的隐式奖励值，不同的算法计算隐式奖励的方式不同，以DPO和SimPO为例
+
 $$
 r_{\text{DPO}}(x,y) = \beta \log \frac{\pi_{\theta}(y \mid x)}{\pi_{\text{ref}}(y \mid x)} + \beta \log Z(x)
 $$
 
 在最终的训练指标中，会省略 $\beta \log Z(x)$ 项
+
 $$
 r_{\text{SimPO}}(x,y) = \frac{\beta}{\left| y \right|} \log \pi_{\theta}(y\mid x) = \frac{\beta}{\left| y \right|} \sum^{\left| y \right|}_{i=1} \log \pi_{\theta} (y_i \mid x, y_{<i})
 $$

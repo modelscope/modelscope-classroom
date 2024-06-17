@@ -7,7 +7,7 @@
 在这里我们集中了魔搭社区的深度学习教程！热爱AI的开发者们可以在这里找到自己想要了解的知识，并学会训练、推理、部署、应用搭建等各类常用操作！
 
 # 🌿更新日志
-
+- ⭐️2024.06.14 补充了人类偏好对齐训练技术解析，请查看[LLM-tutorial](./LLM-tutorial/M.人类偏好对齐训练.md).
 - ⭐️2024.05.16 补充了量化技术解析，请查看[LLM-tutorial](./LLM-tutorial/量化技术解析.md).
 - ⭐️2024.05.16 补充了LISA技术解析，请查看[LLM-tutorial](./LLM-tutorial/LISA微调技术解析.md).
 - ⭐️2024.04.12 新增基于modelscope-agent的Agentfabric的训练教程，即魔搭社区版本的 OPENAI Store [AgentFabric](./LLM-tutorial/Modelscope-Agent:%20AgentFabric微调最佳实践.md).
