@@ -144,13 +144,13 @@ $$J_{r_\phi}(\pi_\theta) = \mathbb{E}_{x \sim D, y \sim \pi_\theta} \left[ r_\ph
 然而强化学习训练过程非常不稳定，为此论文中采取了多项措施来缓解这一点。
 第一，将SFT模型作为参考模型，用 $\pi_\text{ref}$ 表示。在目标函数中加入与参考模型的KL散度正则项来限制模型的更新幅度，
 
-$$J_{r_\phi}(\pi_\theta) = \mathbb{E}_{x \sim D, y \sim \pi_\theta} \left[ r_\phi(x, y)\right]-\beta D_{KL}(\pi_\theta(y\midx)\|\pi_{\text{ref}}(y\midx))$$
+$$J_{r_\phi}(\pi_\theta) = \mathbb{E}_{x \sim D, y \sim \pi_\theta} \left[ r_\phi(x, y)\right]-\beta D_{KL}(\pi_\theta(y\mid x)\|\pi_{\text{ref}}(y\mid x))$$
 
 其中超参 $\beta$ 控制与参考模型的偏离程度
 
 根据目标函数，展开KL散度项，最后的综合奖励可以写为
 
-$$r(x,y)=r_{\phi}(x,y)-\beta(\log\pi_\theta(y\midx)-\log\pi_\text{ref}(y\midx))$$
+$$r(x,y)=r_{\phi}(x,y)-\beta(\log\pi_\theta(y\mid x)-\log\pi_\text{ref}(y\mid x))$$
 
 目标函数写为
 
@@ -193,7 +193,7 @@ $$\mathcal{L}_R (r_\phi) = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}} \left[ \
 
 而对于RLHF强化学习阶段的目标
 
-$$\max_{\pi_{\theta}} J_{r_\phi}(\pi_\theta) = \mathbb{E}_{x \sim D, y \sim \pi_\theta} \left[ r_\phi(x, y)\right]-\beta D_{KL}(\pi_\theta(y\midx)\|\pi_{\text{ref}}(y\midx))$$
+$$\max_{\pi_{\theta}} J_{r_\phi}(\pi_\theta) = \mathbb{E}_{x \sim D, y \sim \pi_\theta} \left[ r_\phi(x, y)\right]-\beta D_{KL}(\pi_\theta(y\mid x)\|\pi_{\text{ref}}(y\mid x))$$
 
 其实存在闭式解，用r表示真正的奖励函数，那么闭式解等于
 
