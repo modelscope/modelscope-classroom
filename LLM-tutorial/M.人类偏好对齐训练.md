@@ -1,6 +1,3 @@
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
 # 人类偏好对齐训练
 
 ## 目录
@@ -53,7 +50,7 @@
 数据集D由模型输入prompt，以及希望模型输出的回答response组成，分别用符号 $x$ , $y$ 表示
 用$\pi_\theta$表示模型，设 $y$ 的长度为 $T$ ，当给定prompt $x$ , 模型产生reponse $y$ 的概率可以表示为
 
-$$\pi_{\theta}(y\mid x) = \left[ \prod_{t=1}^{T} \pi_{\theta} (y_t | x, y_{1:t-1}) \right]$$
+$\pi_{\theta}(y\mid x) = \left[ \prod_{t=1}^{T} \pi_{\theta} (y_t | x, y_{1:t-1}) \right]$
 
 其中 $\pi_{\theta} (y_t | x, y_{1:t-1})$ 表示给定第t个token前的输入，模型输出第t个token的概率
 
@@ -128,6 +125,8 @@ PPO 算法是基于策略的方法中的一种，它结合了策略梯度方法�
 PPO算法的损失函数如下
 
 $$L^{\text{CLIP}}(\theta) = E_{t} \left[ \min \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)} \hat{A}_t(a_t\mid s_t), \text{clip} \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}, 1 - \epsilon, 1 + \epsilon \right) \hat{A}_t(a_t\mid s_t) \right) \right]$$
+
+$\operatorname{clip} \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}, 1 - \epsilon, 1 + \epsilon \right)$
 
 其中：
 $\pi_{\theta}$ 是当前策略，$\pi_{\theta_{\text{old}}}$ 是旧策略，$\hat{A}_t$ 是估计的优势函数（advantage function）值，结合[GAE](https://arxiv.org/abs/1506.02438)算法,通过采样的历史奖励和价值网络进行估计，$\epsilon$ 是一个很小的常数，用于控制新的策略与旧的策略步长的范围。
