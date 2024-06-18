@@ -68,7 +68,7 @@ $$L_{{\text{SFT}}} =- E_{(x, y) \sim D} \left[ \log\pi_\theta(y\mid x)\right] =-
 对于SFT阶段，我们可以简单理解为 对我们想要模型回答好的问题（比如遵循指令进行回答，对应数据集中的prompt），收集想要模型输出的回答（对应数据集中的response），提升模型对期望回答的生成概率。
 
 **第二阶段 奖励建模**
-这一阶段，训练了一个模型来近似人类的偏好对模型的输出进行打分。具体而言，该模型将prompt和response作为输入，输出一个标量值。用 $r_{\phi}$ 表示奖励模型，$r_{\phi}(x,y)$ 表示给定prompt $x$ 和response $y$ 下奖励模型的标量输出
+这一阶段，训练了一个模型来近似人类的偏好对模型的输出进行打分。具体而言，该模型将prompt和response作为输入，输出一个标量值。用 $r_{\phi}$ 表示奖励模型，$r_{\phi} (x,y)$ 表示给定prompt $x$ 和response $y$ 下奖励模型的标量输出
 训练奖励模型使用的数据集D由模型输入prompt，以及希望模型输出的回答chosen和不希望模型输出的回答rejected组成，分别用符号 $x,y_w,y_l$ ,表示。
 
 给定数据 $(x,y_w,y_l)$, 使用最大似然估计损失训练奖励模型
@@ -416,9 +416,11 @@ $$L_{\text{SFT}} =- E_{(x, y) \sim D} \left[ \log\pi_\theta(y\mid x)\right] =- E
 
 $$r_{\text{DPO}}(x,y) = \beta \log \frac{\pi_{\theta}(y \mid x)}{\pi_{\text{ref}}(y \mid x)} + \beta \log Z(x)$$
 
-在最终的训练指标中，会省略 $\beta \log Z(x)$ 项
+> 在最终的训练指标中，会省略 $\beta \log Z(x)$ 项
 
-$$r_{\text{SimPO}}(x,y) = \frac{\beta}{\left| y \right|} \log \pi_{\theta}(y\mid x) = \frac{\beta}{\left| y \right|} \sum^{\left| y \right|}_{i=1} \log \pi_{\theta} (y_i \mid x, y_{<i})$$
+$$
+r_{\text{SimPO}}(x,y) = \frac{\beta}{\left| y \right|} \log \pi_{\theta}(y\mid x) = \frac{\beta}{\left| y \right|} \sum^{\left| y \right|}_{i=1} \log \pi_{\theta} (y_i \mid x, y_{<i})
+$$
 
 奖励可以理解为模型对偏好/拒绝回答的认知。一个比较理想的训练过程是偏好回答的奖励呈上升趋势，从隐式奖励的式子中理解即对偏好回答的概率上升；拒绝回答的奖励呈下降趋势，从隐式奖励的式子中理解即对拒绝回答的生成概率下降；
 
