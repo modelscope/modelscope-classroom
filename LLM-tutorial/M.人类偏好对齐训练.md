@@ -120,11 +120,23 @@ $A^{\pi}(s, a) = Q^{\pi}(s, a) - V^{\pi}(s)$
 
 PPO 算法是基于策略的方法中的一种，它结合了策略梯度方法和信赖域优化的优点，通过限制每次策略更新的步长，保持新策略与旧策略的接近程度，以避免策略更新过大带来的不稳定性和性能下降。
 PPO算法的损失函数如下
+![ppo_loss](./resources/ppo_loss.png)
+
+%%
 $$
 \mathcal{L}^{\text{CLIP}}(\theta) = \mathbb{E}_{t} \left[ \min \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)} \hat{A}_t(a_t\mid s_t), \text{clip} \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}, 1 - \epsilon, 1 + \epsilon \right) \hat{A}_t(a_t\mid s_t) \right) \right]
 $$
-
+%%
 其中：
+
+$$
+\text{clip}(x, a, b) = \begin{cases}
+    a & \text{if } x < a \\
+    b & \text{if } x > b \\
+    x & \text{otherwise}
+\end{cases}
+$$
+
 $\pi_{\theta}$ 是当前策略，$\pi_{\theta_{\text{old}}}$ 是旧策略，$\hat{A}_t$ 是估计的优势函数（advantage function）值，结合[GAE](https://arxiv.org/abs/1506.02438)算法,通过采样的历史奖励和价值网络进行估计，$\epsilon$ 是一个很小的常数，用于控制新的策略与旧的策略步长的范围。
 通过引入 clip 操作，PPO 确保了新策略与旧策略之间的变化不会过大，保证了策略更新过程中的稳定性。
 
@@ -197,7 +209,7 @@ $$
 \pi^\star(\mathbf y \mid \mathbf x) = \frac{1}{Z(\mathbf x)} \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right).
 $$
 
-其中配分函数 $Z(\mathbf x)=\prod_\mathbf y  \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right)$.
+其中配分函数 $Z(\mathbf x)=\sum_\mathbf y  \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right)$.
 
 而实际上即使我们能用奖励模型 $r_\phi$ 去近似 $r$ ，仍然很难计算 $Z(\mathbf x)$ ,然而我们可以通过上述式子得到 真实奖励函数的关于最优策略 $\pi^\star$ 的表达式
 
