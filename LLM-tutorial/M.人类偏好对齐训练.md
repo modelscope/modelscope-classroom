@@ -65,7 +65,7 @@ $$L_{{\text{SFT}}} =- E_{(x, y) \sim D} \left[ \log\pi_\theta(y\mid x)\right] =-
 对于SFT阶段，我们可以简单理解为 对我们想要模型回答好的问题（比如遵循指令进行回答，对应数据集中的prompt），收集想要模型输出的回答（对应数据集中的response），提升模型对期望回答的生成概率。
 
 **第二阶段 奖励建模**
-这一阶段，训练了一个模型来近似人类的偏好对模型的输出进行打分。具体而言，该模型将prompt和response作为输入，输出一个标量值。用 $r_{\phi}$ 表示奖励模型，$r_{\phi} (x,y)$ 表示给定prompt $x$ 和response $y$ 下奖励模型的标量输出
+这一阶段，训练了一个模型来近似人类的偏好对模型的输出进行打分。具体而言，该模型将prompt和response作为输入，输出一个标量值。用 $r_\phi$ 表示奖励模型，$r_\phi (x,y)$ 表示给定prompt $x$ 和response $y$ 下奖励模型的标量输出
 训练奖励模型使用的数据集D由模型输入prompt，以及希望模型输出的回答chosen和不希望模型输出的回答rejected组成，分别用符号 $x,y_w,y_l$ ,表示。
 
 给定数据 $(x,y_w,y_l)$, 使用最大似然估计损失训练奖励模型
@@ -118,18 +118,13 @@ $A^{\pi}(s, a) = Q^{\pi}(s, a) - V^{\pi}(s)$
 
 在强化学习中，策略优化方法可以大致分为基于值函数的（value-based）和基于策略的（policy-based）方法
 
-- 基于值函数的方法（Value-Based Methods）：这些方法通过学习状态值函数 ($V(s)$) 或者动作价值函数 ($Q(s, a)$) 来间接确定策略。典型的算法如 Q-Learning、深度 Q 网络（DQN）等。假设我们可以学习到一个非常近似最优策略 $\pi^\star$ 的动作价值函数 $Q^{\pi^{\star}}$ , 我们就可以根据动作价值选择相应最高的动作，等于间接获得了最优策略。
+- 基于值函数的方法（Value-Based Methods）：这些方法通过学习状态值函数  $V(s)$ 或者动作价值函数 $Q(s, a)$ 来间接确定策略。典型的算法如 Q-Learning、深度 Q 网络（DQN）等。假设我们可以学习到一个非常近似最优策略 $\pi^\star$ 的动作价值函数 $Q^{\pi^{\star}}$ , 我们就可以根据动作价值选择相应最高的动作，等于间接获得了最优策略。
 - 基于策略的方法（Policy-Based Methods）：这些方法直接学习策略，通过优化策略来最大化累计奖励。策略梯度方法（Policy Gradient）是其中的代表。
 
 PPO 算法是基于策略的方法中的一种，它结合了策略梯度方法和信赖域优化的优点，通过限制每次策略更新的步长，保持新策略与旧策略的接近程度，以避免策略更新过大带来的不稳定性和性能下降。
 PPO算法的损失函数如下
 ![ppo_loss](./resources/ppo_loss.png)
 
-%%
-$$
-\mathcal{L}^{\text{CLIP}}(\theta) = \mathbb{E}_{t} \left[ \min \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)} \hat{A}_t(a_t\mid s_t), \text{clip} \left( \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}, 1 - \epsilon, 1 + \epsilon \right) \hat{A}_t(a_t\mid s_t) \right) \right]
-$$
-%%
 其中：
 
 $$
