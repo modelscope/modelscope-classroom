@@ -123,7 +123,7 @@ $A^{\pi}(s, a) = Q^{\pi}(s, a) - V^{\pi}(s)$
 
 PPO 算法是基于策略的方法中的一种，它结合了策略梯度方法和信赖域优化的优点，通过限制每次策略更新的步长，保持新策略与旧策略的接近程度，以避免策略更新过大带来的不稳定性和性能下降。
 PPO算法的损失函数如下
-![ppo_loss](./resources/ppo_loss.png)
+$$L^{\text{CLIP}}(\theta) = E_{t} \left[\min \left( \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)} \hat{A}\_t(a_t \mid s_t), \text{clip} \left( \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}, 1 - \epsilon, 1 + \epsilon \right) \hat{A}_t(a_t \mid s_t) \right) \right]$$
 
 其中：
 
