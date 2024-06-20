@@ -50,7 +50,7 @@
 数据集D由模型输入prompt，以及希望模型输出的回答response组成，分别用符号 $x$ , $y$ 表示
 用$\pi_\theta$表示模型，设 $y$ 的长度为 $T$ ，当给定prompt $x$ , 模型产生reponse $y$ 的概率可以表示为
 
-$\pi_{\theta}(y\mid x) = \left[ \prod_{t=1}^{T} \pi_{\theta} (y_t | x, y_{1:t-1}) \right]$
+$$\pi_{\theta}(y\mid x) = \left[ \prod_{t=1}^{T} \pi_{\theta} (y_t | x, y_{1:t-1}) \right]$$
 
 其中 $\pi_{\theta} (y_t | x, y_{1:t-1})$ 表示给定第t个token前的输入，模型输出第t个token的概率
 
@@ -99,9 +99,9 @@ $$L_R (r_\phi) = -E_{(x, y_w, y_l) \sim D} \left[ \log \sigma (r_\phi (x, y_w) -
 
 折扣因子 $\gamma\in(0,1]$ (在之后的状态价值函数和动作状态价值函数中体现), 有两个作用。第一，表示未来奖励在当前决策中的价值，越小表示智能体越短视（更关注近期奖励）。第二，当MDP无限长时，小于1的折扣因子可以确保后续的价值函数有界。
 
-状态价值函数 $V^{\pi}(s) = E_{a_t\sim\pi(\cdot\mid s_t),s_{t+1}\sim P(\cdot \mid s_t,a_t)} \left[ \sum_{t=0}^{\infty} \gamma^t R(s_t,a_t) \mid s_0 = s \right]$ 表示在状态s下，采取策略 $\pi$ 的期望累积奖励和。可以看到当 $\gamma$ 越小，未来时刻的奖励在求和时越低。
+状态价值函数 $$V^{\pi}(s) = E_{a_t\sim\pi(\cdot\mid s_t),s_{t+1}\sim P(\cdot \mid s_t,a_t)} \left[ \sum_{t=0}^{\infty} \gamma^t R(s_t,a_t) \mid s_0 = s \right]$$ 表示在状态s下，采取策略 $\pi$ 的期望累积奖励和。可以看到当 $\gamma$ 越小，未来时刻的奖励在求和时越低。
 
-动作价值函数 $Q^\pi(s,a)=E_{a_{t+1}\sim\pi(\cdot\mid s_{t+1}),s_{t+1}\sim P(s_t,a_t)} \left[ \sum_{t=0}^{\infty} \gamma^t R(s_t,a_t) \mid s_0 = s,a_0=a \right]$ , 表示在状态 $s$ 和动作 $a$ 下，采取策略 $\pi$ 的期望累积奖励和。
+动作价值函数 $$Q^\pi(s,a)=E_{a_{t+1}\sim\pi(\cdot\mid s_{t+1}),s_{t+1}\sim P(s_t,a_t)} \left[ \sum_{t=0}^{\infty} \gamma^t R(s_t,a_t) \mid s_0 = s,a_0=a \right]$$ , 表示在状态 $s$ 和动作 $a$ 下，采取策略 $\pi$ 的期望累积奖励和。
 
 优势价值函数刻画状态 $s$ 下采取动作奖励 $a$ ，策略 $\pi$ 的相对价值，具体表示为
 $A^{\pi}(s, a) = Q^{\pi}(s, a) - V^{\pi}(s)$
@@ -204,7 +204,7 @@ $$\max_{\pi_{\theta}} J_{r_\phi}(\pi_\theta) = E_{x \sim D, y \sim \pi_\theta} \
 
 $$\pi^\star(y \mid x) = \frac{1}{Z( x)} \pi_{\text{ref}}( y \mid  x) \exp\left(\frac{1}{\beta} r( x,  y)\right).$$
 
-其中配分函数 $Z(\mathbf x)=\sum_\mathbf y  \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right)$.
+其中配分函数 $$Z(\mathbf x)=\sum_\mathbf y  \pi_{\text{ref}}(\mathbf y \mid \mathbf x) \exp\left(\frac{1}{\beta} r(\mathbf x, \mathbf y)\right)$$.
 
 而实际上即使我们能用奖励模型 $r_\phi$ 去近似 $r$ ，仍然很难计算 $Z( x)$ ,然而我们可以通过上述式子得到 真实奖励函数的关于最优策略 $\pi^\star$ 的表达式
 
