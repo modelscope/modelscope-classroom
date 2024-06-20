@@ -212,7 +212,7 @@ $$r(x, y) = \beta \log \left( \frac{\pi^\star(y \mid x)}{\pi_{\text{ref}}(y \mid
 
 将该奖励函数代入BT偏好模型，可以得到最优策略 $\pi^\star$ 的偏好分布
 
-$$p^*(y_1 \succ y_2 \mid x) = \frac{1}{1 + \exp \left( \beta \log \frac{\pi^*(y_2 \mid x)}{\pi_{\text{ref}}(y_2 \mid x)} - \beta \log \frac{\pi^*(y_1 \mid x)}{\pi_{\text{ref}}(y_1 \mid x)} \right)}$$
+$$p^*(y_1 \succ y_2 \mid x) = \frac{1}{1 + \exp \left( \beta \log \frac{\pi^{\*}(y_2 \mid x)}{\pi_{\text{ref}}(y_2 \mid x)} - \beta \log \frac{\pi^{\*}(y_1 \mid x)}{\pi_{\text{ref}}(y_1 \mid x)} \right)}$$
 
 类似于RLHF中的奖励建模阶段，我们用最大似然估计得到DPO的损失函数
 
