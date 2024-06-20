@@ -289,25 +289,21 @@ KTO loss
 $$L_{\text{KTO}}(\pi_{\theta}, \pi_{\text{ref}}) = E_{x,y \sim D}[w(y)(1-v_{\text{KTO}}(x,y;\beta))]$$
 
 其中
+
 $$
 \begin{aligned}
-r_{\text{KTO}}(x, y) &= \beta \log \frac{\pi_{\theta}(y|x)}{\pi_{\text{ref}}(y|x)} \\
-
-z_{\text{ref}} &= E_{x' \sim D} \left[ \beta \text{KL}\left(\pi_{\theta}(y'|x') \|\pi_{\text{ref}}(y'|x')\right) \right]\\
-
-v_{\text{KTO}}(x) &= \left\{
-    \begin{array}{ll}
-        \sigma\left( r_{\text{KTO}}(x, y) - z_{\text{ref}} \right) & \text{if } y \sim y_{\text{desirable }} \mid x \\
-        \sigma\left( z_{\text{ref}} - r_{\text{KTO}}(x, y) \right) & \text{if } y \sim y_{\text{undesirable }} \mid x
-    \end{array}
-\right.\\
-
-w(y) &= \left\{
-    \begin{array}{ll}
-        \lambda_{D} & \text{if } y \sim y_{\text{desirable }} \mid x \\
-        \lambda_{U} & \text{if } y \sim y_{\text{undesirable }} \mid x
-    \end{array}
-\right.
+r_{\text{KTO}}(x, y) &= \beta \log \frac{\pi_{\theta}(y \mid x)}{\pi_{\text{ref}}(y \mid x)} \\
+z_{\text{ref}} &= E_{x' \sim D} \left[ \beta \text{KL}\left(\pi_{\theta}(y' \mid x') \mid\mid \pi_{\text{ref}}(y' \mid x')\right) \right] \\
+v_{\text{KTO}}(x) &= 
+\begin{cases} 
+\sigma\left( r_{\text{KTO}}(x, y) - z_{\text{ref}} \right) & \text{if } y \sim y_{\text{desirable}} \mid x \\ 
+\sigma\left( z_{\text{ref}} - r_{\text{KTO}}(x, y) \right) & \text{if } y \sim y_{\text{undesirable}} \mid x 
+\end{cases} \\
+w(y) &= 
+\begin{cases} 
+\lambda_{D} & \text{if } y \sim y_{\text{desirable}} \mid x \\ 
+\lambda_{U} & \text{if } y \sim y_{\text{undesirable}} \mid x 
+\end{cases} 
 \end{aligned}
 $$
 
@@ -336,11 +332,11 @@ ORPO的论文分析了为什么传统的人类指令对齐方法需要在SFT之�
 
 受此启发，作者在传统的SFT损失函数中加入了一项Odd Ratio损失，具体来说
 
-$${\text{odds}}_\theta(y\mid x) = \frac{P_\theta(y\mid x)}{1-P_\theta(y\mid x)}$$
+$${\text{odds}}_\theta(y\mid x) = \frac{P_\theta(y\mid x)}{1-P\_\theta(y\mid x)}$$
 
 表示模型给定输入 $x$ ,生成回答 $y$ 相比不生成的概率比
 
-$$\text{OR}_\theta(y_w,y_l)=\frac{{{\text{odds}}}_\theta(y_w\mid x) }{{{\text{odds}}}_\theta(y_l\mid x) }$$
+$$\text{OR}\_\theta(y_w,y_l)=\frac{{{\text{odds}}}_\theta(y_w\mid x) }{{{\text{odds}}}\_\theta(y_l\mid x) }$$
 
 最终的ORPO损失函数为
 
