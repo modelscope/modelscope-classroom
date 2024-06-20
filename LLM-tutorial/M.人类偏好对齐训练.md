@@ -423,9 +423,8 @@ $$r_{\text{DPO}}(x,y) = \beta \log \frac{\pi_{\theta}(y \mid x)}{\pi_{\text{ref}
 
 > 在最终的训练指标中，会省略 $\beta \log Z(x)$ 项
 
-$$r_{\text{SimPO}}(x,y) = \frac{\beta}{\left| y \right|} \log \pi_{\theta}(y\mid x) = \frac{\beta}{\left| y \right|} \sum^{\left| y \right|}_{i=1} \log \pi_{\theta} (y_i \mid x, y_{<i})$$
+$$r_{\text{SimPO}}(x,y) = \frac{\beta}{\left| y \right|} \log \pi_{\theta}(y\mid x)= \frac{\beta}{\left| y \right|}\sum^{\left| y \right|}_{i=1}\log\pi\_{\theta}(y\_i \mid x, y\_{{<}i})$$
 
-$$r_{\text{SimPO}}(x,y) = \frac{\beta}{\lvert y \rvert} \log \pi_{\theta}(y \mid x) = \frac{\beta}{\lvert y \rvert} \sum_{i=1}^{\lvert y \rvert} \log \pi_{\theta} (y_i \mid x, y_{<i})$$
 
 奖励可以理解为模型对偏好/拒绝回答的认知。一个比较理想的训练过程是偏好回答的奖励呈上升趋势，从隐式奖励的式子中理解即对偏好回答的概率上升；拒绝回答的奖励呈下降趋势，从隐式奖励的式子中理解即对拒绝回答的生成概率下降；
 
