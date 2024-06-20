@@ -320,8 +320,8 @@ $$
 
 超参
 - beta 同DPO
-- desirable_weight ：损失函数中的\lambda_D项，偏好回答样本的损失权重
-- undesirable_weight ：损失函数中的\lambda_U项，拒绝回答样本的损失权重
+- desirable_weight ：损失函数中的 $\lambda_D$ 项，偏好回答样本的损失权重
+- undesirable_weight ：损失函数中的 $\lambda_U$ 项，拒绝回答样本的损失权重
 
 算法特点
 - KTO不需要成对的偏好/拒绝回答，只需要在SFT数据上额外标注label（好或坏），相比其他算法更容易获取数据
@@ -336,7 +336,7 @@ ORPO的论文分析了为什么传统的人类指令对齐方法需要在SFT之�
 
 受此启发，作者在传统的SFT损失函数中加入了一项Odd Ratio损失，具体来说
 
-$${{\text{odds}}}_\theta(y\mid x) = \frac{P_\theta(y\mid x)}{1-P_\theta(y\mid x)}$$
+$${\text{odds}}_\theta(y\mid x) = \frac{P_\theta(y\mid x)}{1-P_\theta(y\mid x)}$$
 
 表示模型给定输入 $x$ ,生成回答 $y$ 相比不生成的概率比
 
@@ -348,6 +348,7 @@ $$L_{\text{ORPO}}=E_{x,y_w,y_l}[L_{\text{SFT}}-\lambda\log \sigma(\log\text{OR}_
 
 从损失函数可以看出，训练过程中会拉开模型对偏好回答和拒绝回答的生成概率
 超参：$\lambda$ 表示OR loss前的系数
+
 ## SimPO
 
 论文：https://arxiv.org/abs/2405.14734
@@ -422,9 +423,9 @@ $$r_{\text{DPO}}(x,y) = \beta \log \frac{\pi_{\theta}(y \mid x)}{\pi_{\text{ref}
 
 > 在最终的训练指标中，会省略 $\beta \log Z(x)$ 项
 
-$$
-r_{\text{SimPO}}(x,y) = \frac{\beta}{\left| y \right|} \log \pi_{\theta}(y\mid x) = \frac{\beta}{\left| y \right|} \sum^{\left| y \right|}_{i=1} \log \pi_{\theta} (y_i \mid x, y_{<i})
-$$
+$$r_{\text{SimPO}}(x,y) = \frac{\beta}{\left| y \right|} \log \pi_{\theta}(y\mid x) = \frac{\beta}{\left| y \right|} \sum^{\left| y \right|}_{i=1} \log \pi_{\theta} (y_i \mid x, y_{<i})$$
+
+$$r_{\text{SimPO}}(x,y) = \frac{\beta}{\lvert y \rvert} \log \pi_{\theta}(y \mid x) = \frac{\beta}{\lvert y \rvert} \sum_{i=1}^{\lvert y \rvert} \log \pi_{\theta} (y_i \mid x, y_{<i})$$
 
 奖励可以理解为模型对偏好/拒绝回答的认知。一个比较理想的训练过程是偏好回答的奖励呈上升趋势，从隐式奖励的式子中理解即对偏好回答的概率上升；拒绝回答的奖励呈下降趋势，从隐式奖励的式子中理解即对拒绝回答的生成概率下降；
 
