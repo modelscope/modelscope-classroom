@@ -26,6 +26,14 @@
 
 下面我们就让模型学废这种调调。
 
+> 什么时候模型需要训练？
+>
+> - 垂直类目的数据集，在基模型中不包含该类知识
+> - 更优质的数据集，可以让基模型有更好的效果
+> - 某种特定的问答范式，基模型通过prompt-engineering无法拟合该范式
+>
+> 因此，古文翻译腔可以看做是“某个需要角色扮演的微信小程序的后台服务需求”的场景。
+
 ## 环境
 
 - 系统：任何系统均可，推荐使用[魔搭镜像](https://www.modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85)
@@ -44,7 +52,6 @@
 git clone https://github.com/modelscope/swift
 cd swift
 pip install '.[llm]'
-pip install gradio==3.50.2
 ```
 
 ## 准备
@@ -100,7 +107,6 @@ swift sft \
     --lora_target_modules ALL \
     --gradient_checkpointing true \
     --batch_size 1 \
-    --weight_decay 0.1 \
     --learning_rate 5e-5 \
     --gradient_accumulation_steps 16 \
     --max_grad_norm 1.0 \
@@ -112,6 +118,16 @@ swift sft \
 ```
 
 使用单卡进行训练，大概占用18G显存，训练时长40分钟。
+
+```text
+[INFO:swift] Saving model checkpoint to /output/qwen2-7b-instruct/v82-20240701-171712/checkpoint-4120
+{'train_runtime': 3581.3152, 'train_samples_per_second': 18.398, 'train_steps_per_second': 1.15, 'train_loss': 1.12655148, 'epoch': 10.0, 'global_step': 4120}
+Train: 100%|████████████████████████████████████████████████████████████████████████████████████████| 4120/4120 [59:41<00:00,  1.15it/s]
+[INFO:swift] last_model_checkpoint: /output/qwen2-7b-instruct/v82-20240701-171712/checkpoint-4120
+[INFO:swift] best_model_checkpoint: /output/qwen2-7b-instruct/v82-20240701-171712/checkpoint-1600
+[INFO:swift] images_dir: /output/qwen2-7b-instruct/v82-20240701-171712/images
+[INFO:swift] End time of running main: 2024-07-01 18:17:35.112745
+```
 
 ## 推理和评估
 
@@ -144,9 +160,37 @@ swift infer --ckpt_dir output/qwen2-7b-instruct/vxx-xxxx-xxxx/checkpoint-xxx
 
 5. 树上有十只鸟，用枪打死一只，还剩多少只？
 
-![image-20240701154914981](/Users/edward/Library/Application Support/typora-user-images/image-20240701154914981.png)
+![image-20240701154914981](resources/image-20240701154914981.png)
 
-好的，看来效果不错，已经学废了。推理占用了大约**17G显存。
+好的，看来效果不错，已经学废了。推理占用了大约**17G**显存。
+
+我们接下来看下原模型的效果。为了让qwen2-7b-instruct能够尽量模拟古文翻译腔调，我们在推理时使用了system：
+
+> 你是一个用古文翻译腔回复的模型，你的回复腔调需要类似：
+>
+> “我听说在量子力学中，一个粒子的位置和动量是永远不能同时测得的啊！世间万物，又怎么会有两全其美的法则呢？”
+
+1. 你是谁？
+
+![image-20240702104543679](resources/image-20240702104543679.png)
+
+2. 我是一个喜欢音乐的人，你喜欢我吗？
+
+![image-20240702104622420](resources/image-20240702104622420.png)
+
+3. 130+3445等于多少？
+
+![image-20240702104714187](resources/image-20240702104714187.png)
+
+4. 怎么做西红柿炒鸡蛋？
+
+![image-20240702104755829](resources/image-20240702104755829.png)
+
+5. 树上有十只鸟，用枪打死一只，还剩多少只？
+
+![image-20240702104903705](resources/image-20240702104903705.png)
+
+我们可以看到，古文翻译强调基本无法通过prompt-engineering来解决，原模型的训练语料中应该包含了文言文语料，但没有包含翻译腔语料，因此无论怎么提示模型都无法回复出想要的结果。
 
 训好的模型在魔搭上也可以找得到：[Qwen2古文翻译腔7B](https://www.modelscope.cn/models/swift/qwen2-7b-classical-zh-instruct)
 
@@ -214,6 +258,8 @@ print()
 
 ```shell
 swift web-ui
+# 如果使用notebook，需要增加一个环境变量，否则页面打不开
+# GRADIO_ROOT_PATH=/dsw-xxxxxx/proxy/7860/ swift web-ui
 ```
 
 上面的命令会自动打开一个网页：
@@ -232,12 +278,11 @@ swift web-ui
 
 我们先做一个总结：
 
-我们在上面通过**LoRA**的方式**微调**了**千问2-7B模型**，产出了一个**古文翻译腔**模型，并对它进行了量化和部署。但是如果仔细思考整体流程，我们还是有很多问题可以提出。
+我们在上面通过**LoRA**的方式**微调**了**千问2-7B模型**，产出了一个**古文翻译腔**模型，并对它进行了部署。但是如果仔细思考整体流程，我们还是有很多问题可以提出。
 
 1. 为什么在训练后，模型不再回答自己是“通义千问模型”，而回答自己叫“小明”，是一个“大学生”？
 2. 如何利用多卡对模型进行并行训练，提高训练速度？
 3. 在这里我们把LoRA的目标模块设置为**ALL**，代表模型中所有的Linear模块，如果设置为**DEFAULT**，则只对Attention部分应用LoRA，不对MLP应用LoRA，此时模型训练会有什么样的影响？使用**全参数微调**又会有什么样的影响？
-4. 我们使用了GPTQ量化对模型进行了量化及量化推理，量化后效果比量化前会有多大的下降？如果准确评估下降的幅度？
 5. 我们使用了**微调**来实现了古文翻译腔效果，那么微调和人类对齐的应用场景有哪些不同呢？实现古文翻译腔应当使用微调还是人类对齐？如果使用人类对齐，数据集应该做怎样的转换，又如何进行训练呢？
 
 ## 附录
