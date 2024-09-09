@@ -1,10 +1,12 @@
 # 大模型自动评估理论和实战--LLM Automatic Evaluation
 
-引言
-
+##  引言
 **背景**
 
-大语言模型（LLM）评测是LLM开发和应用中的关键环节。目前评测方法可以分为人工评测和自动评测，其中，自动评测技术相比人工评测来讲，具有效率高、一致性好、可复现、鲁棒性好等特点，逐渐成为业界研究的重点。
+大语言模型（LLM）评测是LLM开发和应用中的关键环节，是评估LLM性能、鲁棒性、偏见、幻觉等方面的重要手段。LLM评测的目标是通过一系列的评测任务和指标，全面、客观地评估LLM的性能，为LLM的研发、应用和部署提供参考。
+![image](resources/llm_eval_importance_challenge.png)
+
+目前评测方法可以分为人工评测和自动评测，其中，自动评测技术相比人工评测来讲，具有效率高、一致性好、可复现、鲁棒性好等特点，逐渐成为业界研究的重点。
 
 模型的自动评测技术可以分为rule-based和model-based两大类：
 
@@ -49,8 +51,7 @@
 *   LLM推理性能评估
     
 
-LLM评估的方法论
-
+##  LLM评估的方法论
 ![image](resources/527230d4-206d-4c62-806d-e50ff7547e33.png)
 
 **如何评估一个LLM**
@@ -248,6 +249,10 @@ LLM评估的方法论
 
 ![image](resources/7d2fa017-b4fd-49c0-b69d-6e5fd286efce.png)
 
+*   **主观评测和客观评测**
+![image](resources/llm_eval_subjective.png)
+
+
 *   **LLM指令攻防**
     
     *   指令诱导  (诱导模型输出目标答案，from SuperCLUE)
@@ -257,7 +262,10 @@ LLM评估的方法论
     *   有害指令注入 (将真实有害意图注入到prompt中, from SuperCLUE)
         
     *   ![image](resources/b79d3cf9-b60b-43ba-8d7b-a9b4cc070e6b.png)
-        
+
+*   **Agent评测**
+![image](resources/llm_eval_toolbench.png)
+
 
 #### 2.2 模型性能评估
 
@@ -281,7 +289,10 @@ LLM评估的方法论
 |  input tokens per request  |  平均每个请求的输入token数  |
 |  output tokens per request  |  平均每个请求输出token数  |
 
-问题和挑战
+![image](resources/llm_eval_infer_perf.png)
+
+
+#### 2.3 问题和挑战
 
 1.  **基准失效&数据泄露**
     
@@ -305,11 +316,15 @@ LLM评估的方法论
 *   泛化性问题
     
 *   LLM幻觉的诊断问题
-    
 
-LLM评估实战
+![image](resources/llm_eval_judge_robust.png)
+在添加扰动的情况下，即便是性能强劲的裁判员模型，也会出现性能下降的情况。
 
+
+
+## LLM评估实战
 Eval-Scope框架--轻量化、端到端的大模型自动评估框架
+![image](resources/llm_eval_diagram.png)
 
 GitHub: [https://github.com/modelscope/eval-scope](https://github.com/modelscope/eval-scope)
 
@@ -345,7 +360,7 @@ GitHub: [https://github.com/modelscope/eval-scope](https://github.com/modelscop
 1.  **简单评测**
     
 
-    # 指定模型和数据集
+    > 指定模型和数据集
     python llmuses/run.py --model ZhipuAI/chatglm3-6b --template-type chatglm3 --datasets ceval --outputs ./outputs/test --limit 10
 
 *   \--model: ModelScope模型id， ([https://modelscope.cn/models/ZhipuAI/chatglm3-6b/summary](https://modelscope.cn/models/ZhipuAI/chatglm3-6b/summary)) ，也可以是模型的本地路径
