@@ -189,7 +189,7 @@ conda activate py39
 之后：
 
 ```python
-# 假设已经安装了python，没有安装python
+# 假设已经安装了python，没有安装 torch
 pip install torch
 ```
 
