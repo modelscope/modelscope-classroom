@@ -7,6 +7,7 @@
 在这里我们集中了魔搭社区的深度学习教程！热爱AI的开发者们可以在这里找到自己想要了解的知识，并学会训练、推理、部署、应用搭建等各类常用操作！
 
 # 🌿更新日志
+- ⭐️2024.11.22 添加了使用Omnigen模型合成两个人物拥抱图片的notebook，请查看[Omnigen样例](./AIGC-tutorial/Omnigen_demo.ipynb).
 - ⭐️2024.11.01 补充了一个通用训练流程的notebook，请查看[古文翻译训练样例](./LLM-tutorial/P.训练.ipynb).
 - ⭐️2024.10.30 补充了全流程数据集训练的notebook，请查看[全流程知乎数据集训练](./LLM-tutorial/全流程知乎数据集训练.ipynb).
 - ⭐️2024.10.22 添加了有关 OpenAI-O1 的技术调研，请查看[LLM-tutorial](./LLM-tutorial/从%20OpenAI-O1%20看大模型的复杂推理能力.md).
