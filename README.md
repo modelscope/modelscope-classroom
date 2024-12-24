@@ -7,6 +7,7 @@
 在这里我们集中了魔搭社区的深度学习教程！热爱AI的开发者们可以在这里找到自己想要了解的知识，并学会训练、推理、部署、应用搭建等各类常用操作！
 
 # 🌿更新日志
+- ⭐️2024.12.24 添加了LLaMA-Factory的使用样例，请查看[lf样例](./LLM-tutorial/notebook/llama-factory.ipynb).
 - ⭐️2024.12.24 添加了Dify的使用样例，请查看[这个ipynb](./LLM-tutorial/notebook/dify.ipynb).
 - ⭐️2024.12.23 添加了vLLM和VLMEvalKit的notebook样例，请查看[vLLM样例](./LLM-tutorial/notebook/vllm.ipynb)和[VLMEvalKit样例](./LLM-tutorial/notebook/VLMEvalKit多模态模型评估.ipynb).
 - ⭐️2024.11.22 添加了使用Omnigen模型合成两个人物拥抱图片的notebook，请查看[Omnigen样例](./AIGC-tutorial/notebook/Omnigen_demo.ipynb).
