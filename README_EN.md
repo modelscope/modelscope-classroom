@@ -5,6 +5,7 @@
 Here we have gathered the deep learning tutorials from the MoDao community! Developers who love AI can find the knowledge they want to learn here, and learn how to train, infer, deploy, build applications, and perform various other common operations!
 
 # 🌿 Update Log
+- ⭐️2024.12.24 Add notebook for Dify, please check[this ipynb](./LLM-tutorial/notebook/dify.ipynb).
 - ⭐️2024.12.23 Add example for vLLM and VLMEvalKit. Please check [vLLM example](./LLM-tutorial/notebook/vllm.ipynb)和[VLMEvalKit example](./LLM-tutorial/notebook/VLMEvalKit多模态模型评估.ipynb).
 - ⭐️2024.11.22 Add an example for Omnigen to generate pictures of hugging. Please check[Omnigen example](./AIGC-tutorial/notebook/Omnigen_demo.ipynb).
 - ⭐️2024.11.01 Add a common training notebook，请查看[LLM-tutorial](./LLM-tutorial/notebook/训练.ipynb).
