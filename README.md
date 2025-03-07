@@ -7,6 +7,7 @@
 在这里我们集中了魔搭社区的深度学习教程！热爱AI的开发者们可以在这里找到自己想要了解的知识，并学会训练、推理、部署、应用搭建等各类常用操作！
 
 # 🌿更新日志
+- ⭐️2024.03.07 添加了RAGFlow的使用样例，请查看[RAGFlow样例](./LLM-tutorial/notebook/RAGFlow.ipynb).
 - ⭐️2024.12.30 添加了unsloth的使用样例，请查看[unsloth样例](./LLM-tutorial/notebook/unsloth.ipynb).
 - ⭐️2024.12.24 添加了LLaMA-Factory的使用样例，请查看[LLaMA-Factory样例](./LLM-tutorial/notebook/llama-factory.ipynb).
 - ⭐️2024.12.24 添加了Dify的使用样例，请查看[Dify样例](./LLM-tutorial/notebook/dify.ipynb).
@@ -16,8 +17,8 @@
 - ⭐️2024.10.30 补充了全流程数据集训练的notebook，请查看[全流程知乎数据集训练](./LLM-tutorial/notebook/全流程知乎数据集训练.ipynb).
 - ⭐️2024.10.22 添加了有关 OpenAI-O1 的技术调研，请查看[LLM-tutorial](./LLM-tutorial/从%20OpenAI-O1%20看大模型的复杂推理能力.md).
 - ⭐️2024.06.14 补充了人类偏好对齐训练技术解析，请查看[LLM-tutorial](./LLM-tutorial/M.人类偏好对齐训练.md).
-- ⭐️2024.05.16 补充了量化技术解析，请查看[LLM-tutorial](./LLM-tutorial/量化技术解析.md).
-- ⭐️2024.05.16 补充了LISA技术解析，请查看[LLM-tutorial](./LLM-tutorial/LISA微调技术解析.md).
+- ⭐️2024.05.16 补充了量化技术解析，请查看[LLM-tutorial](./LLM-tutorial/N.量化技术解析.md).
+- ⭐️2024.05.16 补充了LISA技术解析，请查看[LLM-tutorial](./LLM-tutorial/L.LISA微调技术解析.md).
 - ⭐️2024.04.12 新增基于modelscope-agent的Agentfabric的训练教程，即魔搭社区版本的 OPENAI Store [AgentFabric](./LLM-tutorial/Modelscope-Agent:%20AgentFabric微调最佳实践.md).
 - ⭐️2024.03.12 补全LLM大模型系列教程，请查看[LLM-tutorial](./LLM-tutorial).
 - ⭐️2024.03.06 增加了SD-AIGC（文生图、文生视频）的系列教程和Demo，请查看[AIGC-tutorial](./AIGC-tutorial).
