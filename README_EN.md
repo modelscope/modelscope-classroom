@@ -5,7 +5,8 @@
 Here we have gathered the deep learning tutorials from the MoDao community! Developers who love AI can find the knowledge they want to learn here, and learn how to train, infer, deploy, build applications, and perform various other common operations!
 
 # 🌿 Update Log
-- ⭐️2024.12.30 Add notebook for unsloth，请查看[unsloth example](./LLM-tutorial/notebook/unsloth.ipynb).
+- ⭐️2025.03.07 Add notebook for RAGFlow，please check[RAGFlow example](./LLM-tutorial/notebook/RAGFlow.ipynb).
+- ⭐️2024.12.30 Add notebook for unsloth，please check[unsloth example](./LLM-tutorial/notebook/unsloth.ipynb).
 - ⭐️2024.12.24 Add notebook for LLaMA-Factory, please check[LLaMA-Factory example](./LLM-tutorial/notebook/llama-factory.ipynb).
 - ⭐️2024.12.24 Add notebook for Dify, please check[Dify example](./LLM-tutorial/notebook/dify.ipynb).
 - ⭐️2024.12.23 Add example for vLLM and VLMEvalKit. Please check [vLLM example](./LLM-tutorial/notebook/vllm.ipynb)和[VLMEvalKit example](./LLM-tutorial/notebook/VLMEvalKit多模态模型评估.ipynb).
@@ -14,8 +15,8 @@ Here we have gathered the deep learning tutorials from the MoDao community! Deve
 - ⭐️2024.10.30 Add Zhihu dataset training and evaluating notebook, please check [LLM-tutorial](./LLM-tutorial/notebook/全流程知乎数据集训练.ipynb).
 - ⭐️2024.10.22 Add an investigation of O1 preview, check [LLM-tutorial](./LLM-tutorial/从%20OpenAI-O1%20看大模型的复杂推理能力.md).
 - ⭐️2024.06.14 Add human preference alignment training technical analysis, check:[LLM-tutorial](./LLM-tutorial/M.人类偏好对齐训练.md).
-- ⭐️2024.05.16 Add quantization technical analysis, check:[LLM-tutorial](./LLM-tutorial/量化技术解析.md).
-- ⭐️2024.05.16 Add LISA technical analysis, check:[LLM-tutorial](./LLM-tutorial/LISA微调技术解析.md).
+- ⭐️2024.05.16 Add quantization technical analysis, check:[LLM-tutorial](./LLM-tutorial/N.量化技术解析.md).
+- ⭐️2024.05.16 Add LISA technical analysis, check:[LLM-tutorial](./LLM-tutorial/L.LISA微调技术解析.md).
 - ⭐️2024.04.12 Add modelscope-agent: agentfabric（An opensource OPENAI store） finetuning tutorials，please check [AgentFabric](./LLM-tutorial/Modelscope-Agent:%20AgentFabric微调最佳实践.md).
 - ⭐️2024.03.12 Update the LLM tutorials，please check [LLM-tutorial](./LLM-tutorial).
 - ⭐️ 2024.03.06 Added a series of tutorials and demos for SD-AIGC (text-to-image, text-to-video), please check [AIGC-tutorial](./AIGC-tutorial).
