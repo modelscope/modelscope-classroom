@@ -5,6 +5,7 @@
 Here we have gathered the deep learning tutorials from the MoDao community! Developers who love AI can find the knowledge they want to learn here, and learn how to train, infer, deploy, build applications, and perform various other common operations!
 
 # 🌿 Update Log
+- ⭐️2025.03.20 Add notebook for OpenRLHF，please check[OpenRLHF example](.LLM-tutorial/notebook/OpenRLHF.ipynb)
 - ⭐️2025.03.07 Add notebook for RAGFlow，please check[RAGFlow example](./LLM-tutorial/notebook/RAGFlow.ipynb).
 - ⭐️2024.12.30 Add notebook for unsloth，please check[unsloth example](./LLM-tutorial/notebook/unsloth.ipynb).
 - ⭐️2024.12.24 Add notebook for LLaMA-Factory, please check[LLaMA-Factory example](./LLM-tutorial/notebook/llama-factory.ipynb).
