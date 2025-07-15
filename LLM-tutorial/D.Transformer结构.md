@@ -2,9 +2,13 @@
 
 在2017年之后，Transformer结构模型几乎横扫一切统治了NLP领域，后面的CV领域和Audio领域也大放异彩。相比LSTM和CNN结构，Transformer结构好在哪里呢？
 
-<img src="resources/image-20240116205728780.png" alt="image-20240116205728780" style="zoom:50%;" />
+<img src="resources/qwen3-dense.png" alt="qwen3-dense" style="zoom:50%;" />
 
-这是LLaMA2的模型结构。
+这是Qwen3 Dense的模型结构。
+
+既然有Dense模型，那就有MoE模型结构：
+
+<img src="resources/moe.png" alt="moe" style="zoom:50%;" />
 
 介绍下基本结构和流程：
 
@@ -16,6 +20,17 @@
 6. 所有的layers计算过后，经过一个linear求出对vocab每个位置的概率
 
 可以看出，Transformer模型的基本原理是让每个文字的Tensor和其他文字的Tensor做内积（也就是cosine投影值，可以理解为文字的相关程度）。之后把这些相关程度放在一起计算各自占比，再用占比比例分别乘以对应文字的Tensor并相加起来，得到了一个新的Tensor（这个Tensor是之前所有Tensor的概率混合，可以理解为对句子所有文字的抽象）。每个文字都进行如上动作，因此生成的新的Tensor和之前输入的Tensor长度相同（比如输入十个字，计算得到的Tensor还是十个），在层数不断堆叠的情况下，最后的Tensor会越来越抽象出文字的深层次意义，用最后输出的Tensor去计算输出一个新的文字或分类。
+
+MoE结构
+
+将（部分层或全部层）的MLP部分替换为由一个gate控制的专家选择模块：
+
+1. 将每个token选择N个expert
+2. 每个expert分别计算自己分到的tokens
+3. 将所有tokens按顺序组合在一起
+
+MoE结构可以在更大的模型尺寸下使用更少的激活参数，这相当于在显存足够的条件下，使用更少的计算量达到更好的效果。MoE的效果一般介于激活参数量 × 2-3 倍的 Dense 模型，
+可以近似类比为，8×7B（激活13B）大约等效于Dense 30-40B的相同训练质量的模型。因此可以看到，在模型超大时（万亿级别），选择MoE几乎是唯一的路线，因为使用纯粹的Dense模型计算效能太低了。
 
 # Transformer对比CNN和LSTM
 
@@ -36,12 +51,12 @@
 
 # 延展阅读
 
-我们可以看到，LLaMA2的模型特点是：
+当前transformer模型结构的一些特点
 
 1. 没有使用LayerNorm，而是使用了RMSNorm进行预归一化
 2. 使用了RoPE（Rotary Positional Embedding）
 3. MLP使用了SwiGLU作为激活函数
-4. LLaMA2的大模型版本使用了Group Query Attention（GQA）
+4. Group Query Attention（GQA）
 
 ## **RMSNorm**
 
@@ -126,15 +141,3 @@ MHA（Multi-head Attention）是标准的多头注意力机制，具有H个Query
 MQA（Multi-Query Attention，来自于论文：Fast Transformer Decoding: One Write-Head is All You Need）共享了注意力头之间的KV，只为每个头保留单独的Q参数，减少了显存占用。
 
 GQA（Grouped-Query Attention，来自于论文：GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints）在MQA的基础上分成了G个组，组内共享KV。
-
-在Llama2模型中，70B参数为了提升推理性能使用了GQA，其他版本没有使用这项技术。
-
-## ChatGLM2的模型结构
-
-<img src="resources/bd665ecd-9391-4996-a45c-f8dad7e84822.png" alt="img" style="zoom:50%;" />
-
-ChatGLM2模型结构和Llama2的结构有一定相似之处，主要不同之处在于：
-
-1. 在开源的ChatGLM2代码中没有使用GQA，而是使用了MQA
-2. QKV为单一矩阵，在对hidden_state进行整体仿射后拆分为Query、Key、Value
-3. MLP结构中没有使用Up、Gate、Down三个Linear加上SwiGLU，而是使用了hidden_size -> 2 * ffn_hidden_size的Up Linear进行上采样，对tensor进行拆分为两个宽度为ffn_hidden_size的tensor后直接输入SiLU，然后经过ffn_hidden_size -> hidden_size的Down Linear进行下采样
