@@ -7,6 +7,7 @@
 在这里我们集中了魔搭社区的深度学习教程！热爱AI的开发者们可以在这里找到自己想要了解的知识，并学会训练、推理、部署、应用搭建等各类常用操作！
 
 # 🌿更新日志
+- ⭐️2025.07.15 添加了[PPO&GRPO的简单介绍](./LLM-tutorial/S.PPO和GRPO.md)
 - ⭐️2025.03.20 添加了OpenRLHF的使用样例，请查看[OpenRLHF样例](./LLM-tutorial/notebook/OpenRLHF.ipynb)
 - ⭐️2025.03.07 添加了RAGFlow的使用样例，请查看[RAGFlow样例](./LLM-tutorial/notebook/RAGFlow.ipynb).
 - ⭐️2024.12.30 添加了unsloth的使用样例，请查看[unsloth样例](./LLM-tutorial/notebook/unsloth.ipynb).
