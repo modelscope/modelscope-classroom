@@ -15,12 +15,10 @@
 
 如何选择base模型和chat模型进行微调呢？
 
-- 数据量较少的时候（比如小于1w条）建议使用chat模型微调
+- 数据量较少的时候（比如小于几万条）建议使用chat模型微调
 - 数据量较多、数据较为全面的时候，建议使用base模型微调
 
 当然，如果硬件允许，建议两个模型都进行尝试，选择效果较好的。需要注意的是，chat模型有其独特的输入格式，在微调时一定要遵循。base模型的输入格式一般比较简单（但也需要遵守该格式），而且一般该格式不支持多轮数据集。
-
-> 如果需要用base模型训练多轮对话，一般需要使用一个支持多轮对话的template。在SWIFT中，可以指定为`default`，在训练时只需要指定--template_type default即可。
 
 # 重要概念
 
@@ -36,15 +34,16 @@
 
 2. epoch 代表对数据集训练多少轮次
 
-3. iter 对输入数据的每次forward+backward代表一个iter
+3. iter 对模型参数的一次更新代表一个iter
 
 4. batch_size 批处理大小。在一次前向推理中，同时处理多少行数据。由于同一批数据会并行求解梯度，因此batch_size越大，梯度越稳定。在SFT时较为合适的梯度一般选择为16/32/64等值
    1. batch_size越大，并行计算消耗的显存越高。因此在低显存情况下，可以选用batch_size=1，gradient_accumulation_steps=16。训练会在iter%gradient_accumulation_steps==0时集中进行一次参数更新。在iter%gradient_accumulation_steps!=0时，会将梯度值不断累加到参数上，这样就相当于将batch_size扩大了gradient_accumulation_steps倍
+   2. batch_size设置的过大，会导致更新步数过少，起不到收敛效果
 
 5. learning_rate 学习率 训练将负梯度值乘以该值加到原参数上。换句话说，每次只将参数更新一个小幅度，避免向错误的更新方向移动太多。
 
    > 一般LoRA的学习率可以比全参数训练的学习率稍高一点，因为全参数训练会完全重置所有参数，训练时需要学习率更低。
-   > LLM训练的学习率一般设置在1e-4~1e-5不等
+   > LLM训练的学习率一般设置在1e-4~1e-6不等
 
 6. max_length 输入句子的最大长度。比如设置为4096，那么句子加答案转换为token后最大长度为max_length。这个值会影响显存占用，需要按照自己的实际需求设置。
    1. 当batch_size大于1时，意味着不同句子的长度可能不同。data_collator的作用就是按照固定max_length或者batch中的最大长度对其他句子的token进行补齐。补齐的部分不参与模型的loss计算，但仍然会占用计算量
@@ -67,7 +66,7 @@
 
 10. gradient_checkpointing 梯度检查点。该方法的原理是将训练时的中间变量在前向过程中暂时丢弃，并在后向过程中重新计算。该方法可以有效节省训练显存，但属于时间换空间的做法，因此训练时间会变长。对显存的节省可以达到30%-70%不等。训练速度会减慢20%-40%不等。
 
-训练有很多超参数，它们的含义和设置技巧可以[参考这里](https://github.com/modelscope/swift/blob/main/docs/source/LLM/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0.md)。
+训练有很多超参数，它们的含义和设置技巧可以[参考这里](https://swift.readthedocs.io/zh-cn/latest/Instruction/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0.html)。
 
 # 分布式训练（Distributed Training）
 
@@ -80,16 +79,20 @@
 
   - device_map并行：自动计算如何将模型拆分到多个显卡上。比如一个模型按照顺序分为embedder、layer0~95、output，device_map可能将这些参数均分到两张显卡上，比如embedder、layer0~48分配到显卡1上，layer49~95、output分配到显卡2上。相比Megatron，device_map方式较为低效，因为使用该方法训练或推理时，显卡1计算时显卡2是空闲的，计算效率较低；而Megatron是同时使用两个显卡计算，效率较高
 
-  - 流水线并行：类似于device_map，将模型按照layer拆分到不同显卡上
+  - 流水线并行：类似于device_map，将模型按照layer拆分到不同显卡上，Megatron的流水线并行会增加额外的并行度，尽量让空闲显卡并行计算不同的数据，达到挤掉气泡的效果
 
-  - FSDP，在讲FSDPqian需要先讲解DeepSpeed的ZeRO优化方式
+  - FSDP，在讲FSDP前需要先讲解DeepSpeed的ZeRO优化方式
     - ZeRO-1：类似DDP，但是将Optimizer的state均分维护到不同的进程中，每次更新参数后对所有进程的参数进行同步更新
 
     - ZeRO-2：在ZeRO-1的基础上，将不同层的梯度值均分维护到不同的进程中，每次每个进程同步梯度后更新自己负责的梯度对应的参数部分，并在更新后对所有的进程的参数进行同步
 
     - ZeRO-3：在ZeRO-2的基础上，将不同层的模型参数也均分到不同的进程中。每个进程在计算某层结果时，从其他进程中获得对应的层的参数，计算完后抛弃该层参数；backward时，也从其他进程获得对应层的参数并同步梯度信息，计算完后抛弃该层参数。这样每个进程就在仅保存某些层的参数的条件下完成了数据并行计算
+    
+    - ZeRO-3-Offload: 在ZeRO-3基础上，将一定的参数或optimizer卸载到内存中，使用的时候加载回来
+    
+    - ZeRO++: 由于ZeRO3会均匀将参数切分到所有卡中，导致大规模训练时通讯效率低下，ZeRO++会将模型参数拆分到同一个机器的N（一般是8）张卡中
 
-    - FSDP就是ZeRO-3的并行策略
+    - FSDP就是ZeRO-3的并行策略，FSDP2支持了ZeRO++同类型算法
 
 # LoRA
 
@@ -111,93 +114,85 @@ LoRA目前已经是训练SD模型和LLM模型的最常用技术。LoRA的weights
 
 # 训练过程
 
-在前序的文章中，我们讲述了如何进行数据的前处理。结合上面讲解的基本概念，我们就可以运行一个完整的训练过程。
+## 确定要使用的模型
 
-```shell
-pip install ms-swift -U
+首先，你需要选定一个模型，一般来说，如果是端侧应用，选择4B及以下的模型比较合适；如果是单一场景，可以选择7B~14B大小的模型；如果是相对复杂的场景，
+例如涉及到条件判断、代码辅助等，选择32B~72B模型进行训练；如果是精确度要求比较高，工具调用非常复杂的情况，使用72B及以上的模型进行训练。
+
+多模态模型可以进行图片或视频理解、OCR识别、grounding等任务，如果需要比较细节的识别，或者在识别后需要进行相对复杂的操作，选择14B以上模型。
+如果你的数据集质量比较高，而且识别场景较为单一，可以适当降低模型大小。
+
+如果你需要进行继续预训练，使用base模型；如果需要大规模改变模型行为（例如大规模的微调、GRPO等），建议base模型；如果数据量较少，建议Chat模型。
+
+## 数据集的制作
+
+需要保证数据集始终是高质量的，数据重复、无用标点过多、含有太多emoji、描述单一、逻辑混乱等都会导致训练的失败。一个比较不好的数据集例子：
+
+```text
+如果风向从左侧刮来应该进行什么操作？答：AEYGF
+如果操作员误触停止按钮该进行什么操作？答：GRDFV
+```
+在上面的例子中，数据集的回复属于专业用于，和通用训练数据集的分布完全不同，而且很难总结出通用逻辑，这样的训练很难有好的效果。
+如果遇到这样的场景，有几种选项：
+
+- 将生成任务改为分类任务
+
+如果可执行操作的选项是固定的，可以选择将任务从生成任务变为分类任务，这样模型更能够抽象出通用知识
+
+- 增加CoT过程
+
+例如将数据集改为：
+```text
+如果风向从左侧刮来应该进行什么操作？答：由于...的存在，结合...，而...操作需要...，可用操作一共有...种，因此需要进行...，而后...
 ```
 
-安装好SWIFT后，可以直接启动界面运行训练和推理：
+一个好的数据集有以下标准：
 
-```shell
-swift web-ui
-```
+1. 数据逻辑清晰，事实矛盾比较少
+2. 有充足的逻辑推导链条
+3. 多样性比较高
+4. 数据数量充足，最少的数据量需要达到1k
+5. 数据长短不一，且短和长的回复都符合实际情况（例如，用最简短的语言回答；给出完整的推理链路）
+6. url、emoji、标点符号等特殊字符占比较少
+7. 专业知识和模型通用知识以一定比例存在，可以考虑1：2~1：10的比例
 
-[![Watch the video](resources/20240119160942.jpg)](https://modelscope-open.oss-cn-hangzhou.aliyuncs.com/SWIFT%E8%A7%86%E9%A2%91_%E8%B0%83%E6%95%B4%E5%B0%81%E9%9D%A2.mp4)
+在训练过程中，模型有可能对异常数据特别敏感，几条错误数据可能会让模型幻觉恶化一大截。
 
-在框架中，一个最小的训练过程代码如下：
+## 训练框架选择
 
-```python
-# Experimental environment: A10, 3090, V100, ...
-# 20GB GPU memory
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+选择合适自己的训练框架，这里推荐几个比较好的开源框架：
 
-import torch
+- [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)：支持PT、SFT、RLHF、多模态训练、webui等
+- [SWIFT](https://github.com/modelscope/ms-swift)：支持PT、SFT、RLHF、多模态、Megatron、蒸馏、GRPO、拒绝采样等
+- [veRL](https://github.com/volcengine/verl): 支持大规模RL训练，尤其是Megatron+Ray相关的训练
+- [OpenRLHF](https://github.com/OpenRLHF/OpenRLHF): 类比veRL，支持大规模RL训练，尤其是Megatron+Ray相关的训练
+- [axolotl](https://github.com/axolotl-ai-cloud/axolotl): 国外的训练框架，生态比较健康，对国外的大模型支持比较好
 
-from swift.llm import (
-    DatasetName, InferArguments, ModelType, SftArguments,
-    infer_main, sft_main, app_ui_main, merge_lora_main
-)
+## LoRA还是全参
 
-model_type = ModelType.qwen_1_8b
-sft_args = SftArguments(
-    model_type=model_type,
-    train_dataset_sample=2000,
-    dataset=[DatasetName.blossom_math_zh],
-    output_dir='output')
-result = sft_main(sft_args)
-best_model_checkpoint = result['best_model_checkpoint']
-print(f'best_model_checkpoint: {best_model_checkpoint}')
-torch.cuda.empty_cache()
+如果不确定，优先选择LoRA。有几种情况推荐全参训练：
 
-infer_args = InferArguments(
-    ckpt_dir=best_model_checkpoint,
-    load_dataset_config=True,
-    show_dataset_sample=10)
-# merge_lora_main(infer_args)
-result = infer_main(infer_args)
-torch.cuda.empty_cache()
+1. 使用的模型是base模型
+2. 进行PPO、GRPO等强化微调方法
+3. 数据量比较大
+4. 数据格式比较奇怪，不符合通用数据分布的
 
-app_ui_main(infer_args)
-```
+## 超参数
 
-# 自定义一个训练过程
+### 学习率
+如果是LoRA，学习率可以高一些，例如1e-4，如果全参建议1e-5，如果是PPO、GRPO等，建议1e-6左右
 
-上面我们构建了一个最小的训练和推理流程。大多数时候开发者需要自定义一个训练流程和对应的数据集。在这种情况可以参考下面的步骤：
+### 迭代数
+如果数据量比较少，建议混合一些通用数据，避免过拟合；同时迭代数量提高一些（比如5~10），如果数据量比较大，数据质量也比较好，1~3迭代数是比较合理的。
 
-1. 选择一个启动训练的方式，界面方式可以使用上述的web-ui命令（swift web-ui），命令行方式可以参考：
+### batch_size
+根据显卡的显存和计算能力设置，一般可以设置为1~2，同时提高gradient_accumulation_steps到16~32
 
-```shell
-CUDA_VISIBLE_DEVICES=0 \
-swift sft \
-    --model_id_or_path qwen/Qwen-7B-Chat \
-    --dataset blossom-math-zh \
-    --output_dir output \
-```
+## 多卡
+1. 如果显存够用，就只使用DDP
+2. 如果显存溢出，选择deepspeed/FSDP的ZeRO2~ZeRO3-offload不等，如果仍然溢出，考虑使用device_map
+3. 如果是MoE模型，优先选择Megatron
+4. 如果是中大规模训练，优先考虑Megatron
 
-注意命令行具有很多可调节参数，可以[查看文档](https://github.com/modelscope/swift/blob/main/docs/source/LLM/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0.md )来查看这些参数的具体意义。
 
-​	如果想要了解训练流程可以查看[训练代码](https://github.com/modelscope/swift/blob/main/swift/llm/sft.py)
 
-​	了解超参数的拼接和处理可以查看[超参数的处理代码](https://github.com/modelscope/swift/blob/main/swift/llm/utils/argument.py)
-
-​	了解所有支持的模板可以查看[模板的拼接](https://github.com/modelscope/swift/blob/main/swift/llm/utils/template.py)
-
-2. 选择一个需要参与训练的模型，可以参考[支持的模型列表](https://github.com/modelscope/swift/blob/main/docs/source/LLM/%E6%94%AF%E6%8C%81%E7%9A%84%E6%A8%A1%E5%9E%8B%E5%92%8C%E6%95%B0%E6%8D%AE%E9%9B%86.md)。
-3. 选择一个或若干个自己的数据集参与训练，注意这些数据集有一定的[格式要求](https://github.com/modelscope/swift/blob/main/docs/source/LLM/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%8E%E6%8B%93%E5%B1%95.md)。或者也可以使用一个自己的模型训练，只需要[注册自定义模型](https://github.com/modelscope/swift/blob/main/docs/source/LLM/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%8E%E6%8B%93%E5%B1%95.md#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%A8%A1%E5%9E%8B)即可。
-
-```shell
-CUDA_VISIBLE_DEVICES=0 \
-swift sft \
-    --model_id_or_path qwen/Qwen-7B-Chat \
-    --dataset blossom-math-zh \
-    --output_dir output \
-    --custom_train_dataset_path xxx.jsonl zzz.jsonl \
-    --custom_val_dataset_path yyy.jsonl aaa.jsonl \
-```
-
-4. 我们准备了很多模型的可运行脚本，可以查看[脚本的参数](https://github.com/modelscope/swift/tree/main/examples/pytorch/llm/scripts)来确定每个模型推荐的训练参数。
-5. 训练结束后，可以按照[推理加速和部署方案](https://github.com/modelscope/swift/blob/main/docs/source/LLM/VLLM%E6%8E%A8%E7%90%86%E5%8A%A0%E9%80%9F%E4%B8%8E%E9%83%A8%E7%BD%B2.md)一键启动。
-
-6. 一个比较具体的实践方案是[自我认知任务的训练](https://github.com/modelscope/swift/blob/main/docs/source/LLM/%E8%87%AA%E6%88%91%E8%AE%A4%E7%9F%A5%E5%BE%AE%E8%B0%83%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5.md)。
