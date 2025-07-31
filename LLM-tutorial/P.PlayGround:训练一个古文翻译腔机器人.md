@@ -94,19 +94,17 @@ pip install '.[llm]'
 ```shell
 CUDA_VISIBLE_DEVICES=0 \
 swift sft \
-    --model_type qwen2-7b-instruct \
-    --sft_type lora \
+    --model Qwen/Qwen2-7B-Instruct \
+    --train_type lora \
     --output_dir output \
-    --dataset classical-chinese-translate \
+    --dataset swift/classical_chinese_translate \
     --num_train_epochs 1 \
     --max_length 1024 \
-    --check_dataset_strategy warning \
     --lora_rank 8 \
     --lora_alpha 32 \
-    --lora_dropout_p 0.05 \
-    --lora_target_modules ALL \
+    --target_modules all-linear \
     --gradient_checkpointing true \
-    --batch_size 1 \
+    --per_device_eval_batch_size 1 \
     --learning_rate 5e-5 \
     --gradient_accumulation_steps 16 \
     --max_grad_norm 1.0 \
@@ -120,12 +118,12 @@ swift sft \
 使用单卡进行训练，大概占用18G显存，训练时长40分钟。
 
 ```text
-[INFO:swift] Saving model checkpoint to /output/qwen2-7b-instruct/v82-20240701-171712/checkpoint-4120
+[INFO:swift] Saving model checkpoint to /output/v82-20240701-171712/checkpoint-4120
 {'train_runtime': 3581.3152, 'train_samples_per_second': 18.398, 'train_steps_per_second': 1.15, 'train_loss': 1.12655148, 'epoch': 10.0, 'global_step': 4120}
 Train: 100%|████████████████████████████████████████████████████████████████████████████████████████| 4120/4120 [59:41<00:00,  1.15it/s]
-[INFO:swift] last_model_checkpoint: /output/qwen2-7b-instruct/v82-20240701-171712/checkpoint-4120
-[INFO:swift] best_model_checkpoint: /output/qwen2-7b-instruct/v82-20240701-171712/checkpoint-1600
-[INFO:swift] images_dir: /output/qwen2-7b-instruct/v82-20240701-171712/images
+[INFO:swift] last_model_checkpoint: /output/v82-20240701-171712/checkpoint-4120
+[INFO:swift] best_model_checkpoint: /output/v82-20240701-171712/checkpoint-1600
+[INFO:swift] images_dir: /output/v82-20240701-171712/images
 [INFO:swift] End time of running main: 2024-07-01 18:17:35.112745
 ```
 
@@ -137,7 +135,7 @@ Train: 100%|██████████████████████�
 
 ```shell
 #ckpt_dir需要填充为实际的输出目录，这个目录在训练的日志中存在。一般分为两种：best_model_checkpoint和last_model_checkpoint，分别是在训练时进行交叉验证loss最低的检查点和最后一次存储的检查点。
-swift infer --ckpt_dir output/qwen2-7b-instruct/vxx-xxxx-xxxx/checkpoint-xxx
+swift infer --ckpt_dir output/vxx-xxxx-xxxx/checkpoint-xxx
 ```
 
 下面我们用几个简单的问题来试试模型是否已经学废了：
@@ -203,7 +201,7 @@ swift infer --ckpt_dir output/qwen2-7b-instruct/vxx-xxxx-xxxx/checkpoint-xxx
 部署过程如果写代码非常复杂，因为涉及到编写HTTP服务、拉起模型、推理优化等多个层面的工作。不过幸好我们有命令行：
 
 ```shell
-swift deploy --ckpt_dir output/qwen2-7b-instruct/vxx-xxxx-xxxx/checkpoint-xxx
+swift deploy --adapters default-lora=output/vxx-xxxx-xxxx/checkpoint-xxx
 ```
 
 执行后会打印一大堆log，等待打印结束：
@@ -344,7 +342,7 @@ swift web-ui
 
    > swift sft \
    >
-   >   --model_type qwen2-7b-instruct \
+   >   --model Qwen/Qwen2-7B-Instruct \
    >
    >   --dataset swift/classical_chinese_translate \
    >
@@ -352,7 +350,7 @@ swift web-ui
    >
    >   --max_length 1024 \
    >
-   >   --lora_target_modules ALL \
+   >   --target_modules all-linear \
    >
    >   --gradient_accumulation_steps 16 \
    >
