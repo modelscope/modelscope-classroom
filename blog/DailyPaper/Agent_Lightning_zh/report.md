@@ -4,8 +4,6 @@
 
 本文深入分析了"Agent Lightning"框架，这是一个创新性的强化学习(RL)训练框架，专为解决大型语言模型(LLM)驱动的AI Agents在复杂任务中的训练挑战而设计。研究指出，尽管LLM Agents在搜索、代码生成和工具使用等任务中表现出色，但在多轮编码工作流、私有领域数据集或不熟悉工具等真实场景中仍面临显著局限性。Agent Lightning通过将 Agents执行建模为马尔可夫决策过程(MDP)，实现了 Agents执行与RL训练的完全解耦，使开发者几乎无需修改代码即可训练现有 Agents。该框架已在Text-to-SQL、检索增强生成(RAG)和数学问答等三个不同任务上验证了其有效性，展示了在复杂 Agents场景中稳定提升性能的能力。
 
-![3acd042a.png](resources/3acd042a.png)<br>
-**图1：Agent Lightning框架概述** - 一个灵活可扩展的框架，使强化学习能够应用于任何AI Agents
 
 ## 2. 研究背景与挑战
 
