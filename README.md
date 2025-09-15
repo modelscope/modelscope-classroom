@@ -2,11 +2,12 @@
 
 
 
-# 🍀介绍
+## 🍀介绍
 
 在这里我们集中了魔搭社区的深度学习教程！热爱AI的开发者们可以在这里找到自己想要了解的知识，并学会训练、推理、部署、应用搭建等各类常用操作！
+另外，我们新增了blog板块，为大家带来前沿技术的深度分析。
 
-# 🌿更新日志
+## 🌿更新日志
 - 🎉**2025.09.15** 增加了**DailyPaper频道**，参考：[DailyPaper](blog/DailyPaper/README.md)
 - ⭐️2025.07.15 添加了[PPO&GRPO的简单介绍](./LLM-tutorial/S.PPO和GRPO.md)
 - ⭐️2025.03.20 添加了OpenRLHF的使用样例，请查看[OpenRLHF样例](./LLM-tutorial/notebook/OpenRLHF.ipynb)
@@ -29,3 +30,8 @@
   - 提供了[Diffusion扩散技术的教程](./AIGC-tutorial/基于Transformers，diffusion技术解析+实战.md).
 - ⭐️2024.03.06 增加了LLM大模型的系列教程，请查看[LLM-tutorial](./LLM-tutorial).
   - 提供了从深度学习介绍到部署的整套基础流程文档
+
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=modelscope/modelscope-classroom&type=Date)](https://star-history.com/#modelscope/modelscope-classroom&Date)
