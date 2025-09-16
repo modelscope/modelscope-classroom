@@ -177,8 +177,8 @@ def translate_md(source_file, article_type='Blogs', article_group='Articles', en
 
 def run_md():
     shutil.rmtree('_temp', ignore_errors=True)
-    md_file = '/Users/tastelikefeet/Downloads/万字长文深度解析最新Deep Research技术：前沿架构、核心技术与未来展望.md'
-    translate_md(md_file, en_title='Deep-Research-Survey')
+    md_file = '/Users/tastelikefeet/Downloads/图像理解与生成统一模型——前沿模型架构理解.md'
+    translate_md(md_file, en_title='All2All-Survey')
 
 
 if __name__ == '__main__':
