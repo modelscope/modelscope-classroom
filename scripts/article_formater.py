@@ -74,7 +74,7 @@ def process_markdown_media(
 
         local_media = download_media(url, save_dir, article_name + hashlib.md5(url.encode("utf-8")).hexdigest()[:8])
         local_media = local_media.replace(os.path.sep, '/')
-        github_media = f'https://github.com/modelscope/modelscope-classroom/blob/main/{local_media}'
+        github_media = f'https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/{local_media}'
         return f'![{alt_text}]({github_media})'
     return re.sub(media_pattern, replace_media, content)
 

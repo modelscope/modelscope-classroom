@@ -38,17 +38,17 @@ Ulysses是DeepSpeed团队开发的序列并行算法\[2\]。Ulysses的思路可�
 
 通过这样的方式，虽然QKV计算时仍然是O(N^2^) 的激活值，但由于每张卡上Attention Head减少了，因此显存占用仍然会降低。下图是一个简单的例子，假设切分为两个序列，每个序列有两个attention heads:
 
-![pic1.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/21123858.png)
+![pic1.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/21123858.png)
 
 我们放一下论文中给的图：
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/a091734d.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/a091734d.png)
 
 其中，N代表序列长度，d代表hidden\_size，也可以具体理解为Attension Head数量\*实际的hidden\_size。
 
 Ulysses切分后的状态：
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/0d8bd9e0.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/0d8bd9e0.png)
 
 
 Ulysses的技术原理非常清晰，关键点是N/P到d/P的all-to-all通讯。由于QKV在Attention计算时是完整的，而不同的Attention-Head分摊在不同的卡上，因此在GQA、MHA等场景下都是通用的，并且完全兼容flash-attn、SDPA、padding\_free等各种技术。当然，由于存在跨卡通讯，因此backward过程需要额外处理。
@@ -60,11 +60,11 @@ Ulysses的技术原理非常清晰，关键点是N/P到d/P的all-to-all通讯。
 
 > QKV、softmax可以进行分块并行计算和更新，在最大化利用SRAM的能力的同时，降低显存使用。
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/b3e6acfb.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/b3e6acfb.png)
 
 flash-attention的forward流程伪代码：
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/58824543.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/58824543.png)
 
 注意上面Algorithm1中第10~12行的伪代码，该部分对分块的_LSE(_log-sum-exp_)_：
 
@@ -78,7 +78,7 @@ ${lse}\_i^{new} = m\_i^{new} + \log\left(e^{m\_i - m\_i^{new}}\ell\_i + e^{\tild
 
 > Ring-Attention：利用Attention计算可以分块进行的原理，将序列块切分到多张卡上分别计算，再将计算结果合并起来得到最终结果。
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/2deb45c8.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/2deb45c8.png)
 
 假设有N个块，考虑同一个Q~i~ 以及可以在不同块间通讯流转的K~0~n-1~ V~0~n-1~ ，先考虑Softmax部分：
 
@@ -158,11 +158,11 @@ ${out}\_i^{new} =     sigmoid(\text{lse}\_i - \tilde{\text{lse}}\_{ij}) \cdot \t
 
 注意，Ring-Attention有多个变种实现，例如strip-ring-attention\[3\]。在这些实现中，在负载均衡上最优秀的是zigzag（z字型，或者成为之字形）的实现方式。为了理解原始Ring-Attention的问题，我们看下下面的图：
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/51ce37ef.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/51ce37ef.png)
 
 由于GPU 0处理句子的最前部分，因此其他卡的KV流转到GPU 0的时候，GPU由于causal=True的原因根本无法参与计算句子后面的部分，而GPU3可以计算0~2的全部序列，因此每张卡的计算负载并不一致。在这个前提下，Megatron-CP和一些优秀的实现采用了Z字型切分：
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/984002ae.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/984002ae.png)
 
 假设需要切分到4张卡上，那么在保证序列可以被均分为8片的情况下，将0/7组合到一起，1/6组合到一起，2/5、3/4也分别组合到一起，这样可以保证计算的均衡。并且，这种计算还有一个特性：
 
@@ -173,7 +173,7 @@ ${out}\_i^{new} =     sigmoid(\text{lse}\_i - \tilde{\text{lse}}\_{ij}) \cdot \t
 3.  在流转序号大于当前rank时，只需要计算Q的后半部分
     
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/06037e80.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/06037e80.png)
 
 这进一步减小了计算量。代码实现参见：
 
@@ -206,7 +206,7 @@ SWIFT中实现了这样一个融合计算的技术，并且适用于纯文本、
 
 最自然的方式是先用Ulysses做局部gather，整体使用Ring-Attention计算全局LSE和Attention-Out，假设切分为4个子序列(Ulysses world\_size=2, Ring-Attention world\_size=2)，模型head=4，那么：
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/4345df6f.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/4345df6f.png)
 
 在Ulysses all-to-all 通讯后，GPU0,1作为同一个Ulysses组均持有序列0/3，但head不同（前半和后半）。GPU2,3同理。在Ring-Attention计算时，GPU0,2作为Ring-Attention组进行环状通讯，GPU1,3同理。
 
@@ -229,7 +229,7 @@ SWIFT中实现了这样一个融合计算的技术，并且适用于纯文本、
 
 padding\_free可以理解输入格式为flash-attention的形式：多个sequence拼接为一个超长序列。
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/c81d72f5.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/c81d72f5.png)
 
 这种方式给实际的工程实现带来了麻烦。因此在实现中，SWIFT采用了如下的工程方案：
 

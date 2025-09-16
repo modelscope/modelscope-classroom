@@ -12,11 +12,11 @@
 
 Chameleon 的模型架构如下图所示。对于图像理解任务，先使用 VQ-VAE 的 Encoder 作为 Image Tokenizer，将图像编码成离散的 Embedding，然后由自回归模型预测文本输出。对于图像生成任务，使用 VQ-VAE 的 Decoder 作为 Image De-Tokenizer，将自回归模型预测的离散图像 Token 解码成图像。
 
-![截屏2025-07-31 11.04.43.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/409da4d8.png)
+![截屏2025-07-31 11.04.43.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/409da4d8.png)
 
 在这个架构基础上，Janus 团队则认为 VQ-VAE 的 Encoder 是通过重建任务训练得到，并不适合于语义空间的图像理解任务，因此，将图像理解任务的 Image-Tokenizer 修改为使用图文对预训练的 SigLIP。架构如下图所示：Und. Encoder（理解部分） 采用 SigLIP，Gen.Encoder（生成部分） 和 Image Decoder则采用 VQVAE。
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/164d2b24.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/164d2b24.png)
 
 
 简单来看，纯自回归路线的统一模型就是将 VQ-VAE 的离散图像 Token 也纳入 LLM 或 VLM的统一训练中去，它的优点是离散图像 Token 的预测任务与 LLM 的预训练范式高度吻合，也非常符合 AR 模型的特性。但从图像质量来看，这个路线的模型生成的图像质量不尽人意，一方面是由于图像编码空间的离散化带来的效果损失，另一方面则是由于自回归模型无法像扩散模型一样做分布建模。此外，由于无法引入随机噪声，生成图像的多样性差也是这一路线的一大挑战。
@@ -24,7 +24,7 @@ Chameleon 的模型架构如下图所示。对于图像理解任务，先使用 
 
  AR 和 Diffusion 分别是图像理解和生成领域的主流路线，因此可能是最简单有效的统一模型路线就是将 AR 和 Diffusion 串联起来，AR 模型完成理解任务，AR 模型的输入作为 Diffusion 的条件，完成生成任务，架构如下图所示（图源：统一模型综述 \[7\]）。
 
-![截屏2025-08-22 15.25.01.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/244534b3.png)
+![截屏2025-08-22 15.25.01.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/244534b3.png)
 
 对于理解任务，图像由语义编码器（一般是 CLIP、SigLIP 或者经过图文对齐训练的 ViT）编码成连续的 Embedding。对于生成（文生图）任务，则由模型处理文本输入后，输出一个中间 Embedding，作为 Diffusion 模型生成图像的条件。在这里，生成任务的图像编码就是 AR 和 Diffusion 模型的中间 Embedding，由 AR 模型直接产生。在这里，我们根据是否显式地监督中间 Embedding，将几个典型的工作分成两类。
 
@@ -32,31 +32,31 @@ Chameleon 的模型架构如下图所示。对于图像理解任务，先使用 
 
 顾名思义，这类方法是使用损失函数直接监督 AR 模型的输出图像 Embedding，使其有一个明确的 Embedding 输出目标，同时使用这些 Embedding 来训练 Diffusion 模型进行图像重建。典型的方法包括 MetaMorph\[8\], Nexus-Gen\[9\] 和 Blip-3o\[10\]。其典型架构如下图所示：
 
-![截屏2025-08-22 15.53.03.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/de912c54.png)
+![截屏2025-08-22 15.53.03.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/de912c54.png)
 
 如上图b所示，MetaMorph 和 Nexus-Gen 会使用 Image Loss（一般为 MSE 或者余弦相似度损失） 来使监督 AR 模型，使其学会预测目标图像的语义 Embedding。这样做的原因一方面是**想要从 Joint Training 的角度回答为什么要做统一模型**，在 MetaMorph 的实验中，图像理解和生成任务一起从零开始训练能互相促进彼此的效果。另一方面，Nexus-Gen 的 Unified Image Embedding Space 将理解和生成建模成了一个逆向任务，潜在的好处是可以直接对生成的 Embedding 做理解，从而有多轮推理的潜力。此外，在这一个子路线还存在一个问题，即监督自回归模型来预测连续的图像 Embedding 会导致严重的误差累计问题，MetaMorph 忽略了这一现象，而 Nexus-Gen 则采用了预填充自回归的策略来解决，这个策略本质上与其他工作 (Blip-3o, MetaQuery\[11\]) 的 Learnable Query 是一致的。
 
 Blip-3o 也是类似 Embedding 监督训练思路，但他们额外使用 FlowMatching 来对语义 Embedding 做分布建模， 算是在这个架构中分析了自回归模型中无法做分布建模的问题。如下图所示：
 
-![截屏2025-08-22 16.09.16.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/a40097db.png)
+![截屏2025-08-22 16.09.16.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/a40097db.png)
 
 ### 2.2 直接训练 Diffusion 模型的方法
 
 
 这类方法一般将 AR 模型冻住，直接使用 AR 模型输出的 hidden states 作为Diffusion 模型的条件，只训练 Diffusion 做图像生成。换一个角度，可以把这个路线的方法看成 Diffusion 技术的演进，即将 Diffusion 模型常用的 T5 Text Encoder 换成了 一个更大的多模态生成式模型（例如Qwen2.5-VL-7B ）。典型的方法包括 Uniworld\[12\], MetaQuery (特殊说明，MetaQuery 使用的条件提取方式是 Learnable Query，不是 hidden states), Qwen-Image\[13\] 和 OmniGen2\[14\]。在图像生成任务上，其典型架构如下图所示（图源：Qwen-Image），文本 Prompt 输入 Qwen2.5-Vl，直接输出这些 Token 对应的 hidden states，作为后续 Diffusion Transformer 的文本条件。
-![截屏2025-08-22 16.26.38.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/1067ae96.png)
+![截屏2025-08-22 16.26.38.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/1067ae96.png)
 
 除了图像生成外，统一模型一个潜力在于其图像编辑能力，因此，我们在这里额外分析一下这几个模型的图像编辑架构。相比于图像生成任务，使用 Diffusion 模型进行图像编辑时有一个额外的输入条件，即待编辑图像的编码信息。 待编辑图像可以使用两种编码，第一种是语义编码，编码器采用SigLIP等语义编码器。第二种是重建编码，编码器采用VAE。
 
 1.  语义编码架构：以Uniworld为例，采用语义编码的架构如下图所示，着重关注SigLIP部分，如图所示，待编辑图像直接通过SigLIP 和 MLP 之后，作为一个条件输入到 DiT 中。Nexus-Gen也支持图像编辑，采用的条件注入架构也是这种语义编码特征。从 Nexus-Gen 在图像编辑上的实验经验来看，语义特征编码相比于 VAE 编码，编码空间更接近VLM 的输出语义空间，仅需要少量数据训练就可以建立起文本条件和图像条件之间的关系，潜在的优势是更好的指令遵循能力。 这种编码架构的劣势在于，语义编码存在信息损失，重建效果和编码 Token 数量强相关，往往不能做到一对一重建。从图像编辑的重建效果来看，GPT4o-Image 很可能也是采用语义编码。
     
 
-![截屏2025-08-22 16.37.21.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/f697f06f.png)
+![截屏2025-08-22 16.37.21.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/f697f06f.png)
 
 2.  VAE 编码架构：Qwen-Image 和 OmniGen2 采用的是这种架构，目光放远，早些时候开源的 Step1X-Edit 与 Flux-Kontext 都是一模一样的架构。再把目光放远，这种架构和 In-Context LoRA 与 OmniControl 的思路是一致的。以Qwen-Image 为例，架构如下图所示。重点关注 Input Image, 它经过 VAE Encoder 后，作为条件输入 DiT中。在这个架构中，一般会使用位置编码来区分输入图像和去噪图像，像 Qwen-Image\[15\] 和 Flux-Kontext\[16\] 都是直接在位置编码的第一维（帧id）做区分。
     
 
-![截屏2025-08-22 16.54.17.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/fe100074.png)
+![截屏2025-08-22 16.54.17.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/fe100074.png)
 
 ## AR + Diffusion 并联结构
 
@@ -66,13 +66,13 @@ Blip-3o 也是类似 Embedding 监督训练思路，但他们额外使用 FlowMa
 
 
 LlamaFusion 的架构如下图所示。给定一个语言模型，如下左图，作者将其参数复制一份，作为右图的图像生成专用参数。对于一个包含文本和噪声图像的序列，文本 Token 使用左图的参数计算，而图像 Token 使用右图的参数训练，但是在 Attention 的计算阶段，所有 Token 拼接到一起做 Self-Attention。由于语言模型冻住，这个架构并不能改变模型的理解能力，所以不涉及图像理解任务中的编码问题。而图像生成使用的编码和解码都是 VAE，尽管模型采用的是语言模型结构，但实际是使用 Diffusion 的路线进行图像生成。
-![截屏2025-08-22 17.16.34.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/b0aebf44.png)
+![截屏2025-08-22 17.16.34.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/b0aebf44.png)
 
 ### 3.2 Bagel 图文混合训练
 
 Bagel 采用和 LlamaFusion 相似的架构，不同的是，模型的图像理解和生成能力全部都是重头开始训练的。_模型的图像理解采用的编码器是_ SigLIP 这类语义编码的模型，而图像生成采用的编码器和解码器是 VAE 这样的重建模型。理解任务使用 AR 的方式自回归地生成文本 Token，而生成任务则采用 Diffusion 的方式生成图像的 VAE 特征。
 
-![截屏2025-08-22 17.03.53.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/2def5fb3.png)
+![截屏2025-08-22 17.03.53.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/2def5fb3.png)
 
 严格来讲， Bagel 算是第一个进行了超大规模预训练的统一模型，其独特之处真正做了基模级别的混合模态数据的训练（上一个还是Chameleon），并且论文中也提到了这样 setting 下的 emerging capabilities。
 
@@ -82,7 +82,7 @@ Bagel 采用和 LlamaFusion 相似的架构，不同的是，模型的图像理�
 
 以 Transfuion 为例，其架构图如下所示。模型使用了一个 7B 的 Transformer 模型来做统一的序列和分布建模，对于文本 Token 做序列建模，对于图像 Token 做分布建模。图像理解和生成任务使用的图像编码都是 VAE 特征。Show-O 与 Show-O2 采用了类似的架构，只是它们做 Diffusion 时只有一个轻量的 Flow Head 做图像去噪，这里就不额外分析了。
 
-![截屏2025-08-22 17.56.14.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/All2All-Survey/resources/75f56643.png)
+![截屏2025-08-22 17.56.14.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/All2All-Survey/resources/75f56643.png)
 
 ## 总结
 
