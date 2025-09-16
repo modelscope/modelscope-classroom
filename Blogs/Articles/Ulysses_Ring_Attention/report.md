@@ -68,9 +68,9 @@ flash-attention的forward流程伪代码：
 
 注意上面Algorithm1中第10~12行的伪代码，该部分对分块的_LSE(_log-sum-exp_)_：
 
-${lse}\_i^{new} = m\_i^{new} + \log\left(e^{m\_i - m\_i^{new}}\ell\_i + e^{\tilde m\_{ij}-m\_i^{new}} \tilde \ell\_{ij}\right)$
+$${lse}\_i^{new} = m\_i^{new} + \log\left(e^{m\_i - m\_i^{new}}\ell\_i + e^{\tilde m\_{ij}-m\_i^{new}} \tilde \ell\_{ij}\right)$$
 
-其中：$m\_i^{new} = \max(m\_i, \tilde m\_{ij})$
+其中：$$m\_i^{new} = \max(m\_i, \tilde m\_{ij})$$
 
 和Attention-Out进行了合并更新，即在计算完新的块之后，将新的块的结果和老块的结果进行合并，得到完整的结果。
 
@@ -82,33 +82,33 @@ ${lse}\_i^{new} = m\_i^{new} + \log\left(e^{m\_i - m\_i^{new}}\ell\_i + e^{\tild
 
 假设有N个块，考虑同一个Q~i~ 以及可以在不同块间通讯流转的K~0~n-1~ V~0~n-1~ ，先考虑Softmax部分：
 
-$p\_{ij} = \frac{e^{x\_{ij}}}{Z\_i}$
+$$p\_{ij} = \frac{e^{x\_{ij}}}{Z\_i}$$
 
-其中：$Z\_i = \sum\_{j=1}^N e^{x\_{ij}}$
+其中：$$Z\_i = \sum\_{j=1}^N e^{x\_{ij}}$$
 
 一般来说，为了数值稳定不会直接计算指数，而是使用数值稳定的计算方式：
 
-$p\_{ij} = \exp(x\_{ij} - \text{lse}\_i)$
+$$p\_{ij} = \exp(x\_{ij} - \text{lse}\_i)$$
 
-$\text{lse}\_i = \log \sum\_{j=1}^N e^{x\_{ij}}$
+$$\text{lse}\_i = \log \sum\_{j=1}^N e^{x\_{ij}}$$
 
 可以看到使用指数公式展开后，该方式和上面的原始公式是等价的。
 
 下面我们需要递推LSE和Attention-Out的更新，先来看LSE，考虑已经有前置的累加结果和当前块结果，那么新的LSE应该是：
 
-$Z\_i^{new} = \sum\_{j\in\text{prev}} e^{x\_{ij}} + \sum\_{j\in\text{block}} e^{x\_{ij}}$
+$$Z\_i^{new} = \sum\_{j\in\text{prev}} e^{x\_{ij}} + \sum\_{j\in\text{block}} e^{x\_{ij}}$$
 
 那么：
 
-${lse}\_i^{new} = \log\!\big(e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}\big)$
+$${lse}\_i^{new} = \log\!\big(e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}\big)$$
 
 其中i代表旧的累积值，ij代表当前块的值。针对右侧log进行展开：
 
-${lse}\_i^{new} = {lse}\_i + \log\!\left(1 + e^{\tilde{\text{lse}}\_{ij} - \text{lse}\_i}\right)$
+$${lse}\_i^{new} = {lse}\_i + \log\!\left(1 + e^{\tilde{\text{lse}}\_{ij} - \text{lse}\_i}\right)$$
 
 
 同理为了数值稳定，不在这里计算指数，而将右侧合并为logsigmoid的形式。在PyTorch中，logsigmoid的softplus算子会负责数值稳定的计算：
-${lse}\_i^{new} = {lse}\_i - \mathrm{logsigmoid}(\text{lse}\_i - \tilde{\text{lse}}\_{ij})$
+$${lse}\_i^{new} = {lse}\_i - \mathrm{logsigmoid}(\text{lse}\_i - \tilde{\text{lse}}\_{ij})$$
 
 这就是Ring-Attention的LSE更新公式。
 
@@ -116,31 +116,31 @@ ${lse}\_i^{new} = {lse}\_i - \mathrm{logsigmoid}(\text{lse}\_i - \tilde{\text{ls
 
 根据Attention计算公式和分块定义，假设之前块的计算结果：
 
-$A\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}} v\_j,\quad   Z\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}}$
+$$A\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}} v\_j,\quad   Z\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}}$$
 
 当前块的计算结果：
 
-$\tilde A\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}} v\_j,\quad   \tilde Z\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}}$
+$$\tilde A\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}} v\_j,\quad   \tilde Z\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}}$$
 
 于是：
 
-$A\_i^{new} = A\_i + \tilde A\_{ij},\quad Z\_i^{new} = Z\_i + \tilde Z\_{ij},\quad {out}\_i^{new} = \frac{A\_i^{new}}{Z\_i^{new}}$
+$$A\_i^{new} = A\_i + \tilde A\_{ij},\quad Z\_i^{new} = Z\_i + \tilde Z\_{ij},\quad {out}\_i^{new} = \frac{A\_i^{new}}{Z\_i^{new}}$$
 
 使用LSE来表示上面的公式：
 
-${out}\_i^{new} = \frac{A\_i+ \tilde A\_{ij}}{e^{\text{lse}\_i^{new}}}$
+$${out}\_i^{new} = \frac{A\_i+ \tilde A\_{ij}}{e^{\text{lse}\_i^{new}}}$$
 
 根据Attention公式：
 
-$A\_i = e^{\text{lse}\_i} \cdot \text{out}\_i,   \quad   \tilde A\_{ij} = e^{\tilde{\text{lse}}\_{ij}} \cdot \tilde{\text{out}}\_{ij}$
+$$A\_i = e^{\text{lse}\_i} \cdot \text{out}\_i,   \quad   \tilde A\_{ij} = e^{\tilde{\text{lse}}\_{ij}} \cdot \tilde{\text{out}}\_{ij}$$
 
 代入上面：
 
-$\text{out}\_i^{new} = \frac{e^{\text{lse}\_i}\,\text{out}\_i + e^{\tilde{\text{lse}}\_{ij}}\,\tilde{\text{out}}\_{ij}}{e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}}$
+$$\text{out}\_i^{new} = \frac{e^{\text{lse}\_i}\,\text{out}\_i + e^{\tilde{\text{lse}}\_{ij}}\,\tilde{\text{out}}\_{ij}}{e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}}$$
 
 注意到上面的公式分子左右拆分后，可以变为两个独立的式子相加，并且这两个式子分别是sigmoid的形式，因此得到：
 
-${out}\_i^{new} =     sigmoid(\text{lse}\_i - \tilde{\text{lse}}\_{ij}) \cdot \text{out}\_i  + sigmoid(\tilde{\text{lse}}\_{ij} - \text{lse}\_i) \cdot \tilde{\text{out}}\_{ij}$
+$${out}\_i^{new} =     sigmoid(\text{lse}\_i - \tilde{\text{lse}}\_{ij}) \cdot \text{out}\_i  + sigmoid(\tilde{\text{lse}}\_{ij} - \text{lse}\_i) \cdot \tilde{\text{out}}\_{ij}$$
 
 > 这两个更新公式和flash-attention论文中给的递归公式是等价的，同样是分块更新和online-softmax的思路。
 

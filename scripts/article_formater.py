@@ -45,8 +45,11 @@ What follows is a portion of an academic article that you need to translate acco
 1. Ensure translation accuracy and do not omit any sentences or paragraphs
 2. Lists and tables also need to be translated, maintaining their usability after translation
 3. Ensure formulas, image links, etc. are output as-is
-4. If a proper noun cannot be translated, or loss its meaning after translation, keep it unchanged
-5. Your output should not contain ```, nor should it include any summary of the input paragraphs. **Your responsibility is only translation** - do not output extraneous symbols or statements
+4. Fix errors that do not match the markdown grammar
+    * Normal Latex should wrapped with $$latex here$$
+    * Inline Latex should wrapped with \\(latex here\\) 
+5. If a proper noun cannot be translated, or loss its meaning after translation, keep it unchanged
+6. Your output should not contain ```, nor should it include any summary of the input paragraphs. **Your responsibility is only translation** - do not output extraneous symbols or statements
 
 Now begin:
 """
