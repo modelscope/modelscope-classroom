@@ -31,7 +31,7 @@ def download_media(url, save_dir, filename):
         ext = media_name.split('.')[-1]
 
     file_path = file_path + '.' + ext
-    with open(file_path + '.' + ext, 'wb') as file:
+    with open(file_path, 'wb') as file:
         for chunk in response.iter_content(chunk_size=8192):
             file.write(chunk)
 
