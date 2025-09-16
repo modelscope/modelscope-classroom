@@ -64,9 +64,11 @@ Pseudocode for flash-attention forward process:
 
 Note the pseudocode in lines 10~12 of Algorithm1 above, this part performs merged updates on the block-wise _LSE_ (_log-sum-exp_):
 
-${lse}\_i^{new} = m\_i^{new} + \log\left(e^{m\_i - m\_i^{new}}\ell\_i + e^{\tilde m\_{ij}-m\_i^{new}} \tilde \ell\_{ij}\right)$
+$${lse}\_i^{new} = m\_i^{new} + \log\left(e^{m\_i - m\_i^{new}}\ell\_i + e^{\tilde m\_{ij}-m\_i^{new}} \tilde \ell\_{ij}\right)$$
 
-Where: $m\_i^{new} = \max(m\_i, \tilde m\_{ij})$
+Where: 
+
+$$m\_i^{new} = \max(m\_i, \tilde m\_{ij})$$
 
 And Attention-Out are merged and updated, that is, after computing new blocks, the results of new blocks are merged with the results of old blocks to obtain complete results.
 
@@ -78,31 +80,33 @@ So, if each card carries a portion of the sequence length and computation result
 
 Assuming there are N blocks, consider the same Q~i~ and K~0~n-1~ V~0~n-1~ that can communicate and flow between different blocks. First consider the Softmax part:
 
-$p\_{ij} = \frac{e^{x\_{ij}}}{Z\_i}$
+$$p\_{ij} = \frac{e^{x\_{ij}}}{Z\_i}$$
 
-Where: $Z\_i = \sum\_{j=1}^N e^{x\_{ij}}$
+Where: 
+
+$$Z\_i = \sum\_{j=1}^N e^{x\_{ij}}$$
 
 Generally, to avoid numerical instability, exponentials are not computed directly, but rather using numerically stable computation methods:
 
-$p\_{ij} = \exp(x\_{ij} - \text{lse}\_i)$
+$$p\_{ij} = \exp(x\_{ij} - \text{lse}\_i)$$
 
-$\text{lse}\_i = \log \sum\_{j=1}^N e^{x\_{ij}}$
+$$\text{lse}\_i = \log \sum\_{j=1}^N e^{x\_{ij}}$$
 
 It can be seen that after expanding using the exponential formula, this method is equivalent to the original formula above.
 
 Next, we need to derive the updates for LSE and Attention-Out recursively. Let's first look at LSE. Considering we already have previous accumulated results and current block results, the new LSE should be:
 
-$Z\_i^{new} = \sum\_{j\in\text{prev}} e^{x\_{ij}} + \sum\_{j\in\text{block}} e^{x\_{ij}}$
+$$Z\_i^{new} = \sum\_{j\in\text{prev}} e^{x\_{ij}} + \sum\_{j\in\text{block}} e^{x\_{ij}}$$
 
 Then:
 
-${lse}\_i^{new} = \log\!\big(e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}\big)$
+$${lse}\_i^{new} = \log\!\big(e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}\big)$$
 
 Where i represents the old accumulated value, and ij represents the current block value. Expanding the log on the right side:
 
-${lse}\_i^{new} = {lse}\_i + \log\!\left(1 + e^{\tilde{\text{lse}}\_{ij} - \text{lse}\_i}\right)$
+$${lse}\_i^{new} = {lse}\_i + \log\!\left(1 + e^{\tilde{\text{lse}}\_{ij} - \text{lse}\_i}\right)$$
 Similarly, for numerical stability, we do not compute the exponential here, but merge the right side into the logsigmoid form. In PyTorch, the softplus operator of logsigmoid handles numerically stable computation:
-${lse}\_i^{new} = {lse}\_i - \mathrm{logsigmoid}(\text{lse}\_i - \tilde{\text{lse}}\_{ij})$
+$${lse}\_i^{new} = {lse}\_i - \mathrm{logsigmoid}(\text{lse}\_i - \tilde{\text{lse}}\_{ij})$$
 
 This is the LSE update formula for Ring-Attention.
 
@@ -110,31 +114,31 @@ Next, let's consider Attention-Out. We currently have four values: block LSE, pr
 
 According to the Attention computation formula and block definition, assume the computation results of previous blocks:
 
-$A\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}} v\_j,\quad   Z\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}}$
+$$A\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}} v\_j,\quad   Z\_i = \sum\_{j \in \text{prev}} e^{x\_{ij}}$$
 
 The computation results of the current block:
 
-$\tilde A\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}} v\_j,\quad   \tilde Z\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}}$
+$$\tilde A\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}} v\_j,\quad   \tilde Z\_{ij} = \sum\_{j \in \text{block}} e^{x\_{ij}}$$
 
 Thus:
 
-$A\_i^{new} = A\_i + \tilde A\_{ij},\quad Z\_i^{new} = Z\_i + \tilde Z\_{ij},\quad {out}\_i^{new} = \frac{A\_i^{new}}{Z\_i^{new}}$
+$$A\_i^{new} = A\_i + \tilde A\_{ij},\quad Z\_i^{new} = Z\_i + \tilde Z\_{ij},\quad {out}\_i^{new} = \frac{A\_i^{new}}{Z\_i^{new}}$$
 
 Using LSE to represent the above formula:
 
-${out}\_i^{new} = \frac{A\_i+ \tilde A\_{ij}}{e^{\text{lse}\_i^{new}}}$
+$${out}\_i^{new} = \frac{A\_i+ \tilde A\_{ij}}{e^{\text{lse}\_i^{new}}}$$
 
 According to the Attention formula:
 
-$A\_i = e^{\text{lse}\_i} \cdot \text{out}\_i,   \quad   \tilde A\_{ij} = e^{\tilde{\text{lse}}\_{ij}} \cdot \tilde{\text{out}}\_{ij}$
+$$A\_i = e^{\text{lse}\_i} \cdot \text{out}\_i,   \quad   \tilde A\_{ij} = e^{\tilde{\text{lse}}\_{ij}} \cdot \tilde{\text{out}}\_{ij}$$
 
 Substituting into the above:
 
-$\text{out}\_i^{new} = \frac{e^{\text{lse}\_i}\,\text{out}\_i + e^{\tilde{\text{lse}}\_{ij}}\,\tilde{\text{out}}\_{ij}}{e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}}$
+$$\text{out}\_i^{new} = \frac{e^{\text{lse}\_i}\,\text{out}\_i + e^{\tilde{\text{lse}}\_{ij}}\,\tilde{\text{out}}\_{ij}}{e^{\text{lse}\_i} + e^{\tilde{\text{lse}}\_{ij}}}$$
 
 Note that after splitting the numerator in the above formula, it can be transformed into the sum of two independent expressions, and these two expressions are respectively in sigmoid form, thus we obtain:
 
-${out}\_i^{new} =     sigmoid(\text{lse}\_i - \tilde{\text{lse}}\_{ij}) \cdot \text{out}\_i  + sigmoid(\tilde{\text{lse}}\_{ij} - \text{lse}\_i) \cdot \tilde{\text{out}}\_{ij}$
+$${out}\_i^{new} =     sigmoid(\text{lse}\_i - \tilde{\text{lse}}\_{ij}) \cdot \text{out}\_i  + sigmoid(\tilde{\text{lse}}\_{ij} - \text{lse}\_i) \cdot \tilde{\text{out}}\_{ij}$$
 
 > These two update formulas are equivalent to the recursive formulas given in the flash-attention paper, both following the approach of block updates and online-softmax.
 
