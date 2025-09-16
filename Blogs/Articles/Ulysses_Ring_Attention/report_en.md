@@ -35,17 +35,17 @@ Ulysses is a sequence parallelism algorithm developed by the DeepSpeed team[2]. 
 
 Through this approach, although QKV computation still involves O(N^2) activation values, memory usage is still reduced because each card has fewer Attention Heads. The following figure shows a simple example, assuming splitting into two sequences, each with two attention heads:
 
-![pic1.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/21123858.png)
+![pic1.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/21123858.png)
 
 Here's the figure from the paper:
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/a091734d.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/a091734d.png)
 
 Where N represents sequence length, and d represents hidden_size, which can also be specifically understood as the number of Attention Heads * actual hidden_size.
 
 State after Ulysses splitting:
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/0d8bd9e0.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/0d8bd9e0.png)
 The technical principle of Ulysses is very clear, with the key point being the all-to-all communication from N/P to d/P. Since QKV is complete during Attention computation, and different Attention-Heads are distributed across different cards, it is universal in scenarios like GQA and MHA, and is fully compatible with various technologies such as flash-attn, SDPA, and padding_free. Of course, due to the existence of cross-card communication, the backward process requires additional handling.
 
 However, the limitations of Ulysses are also quite obvious, namely being constrained by the number of Attention Heads. Especially in GQA where the number of KV heads is much smaller than the number of Q heads, Ulysses may not be able to split across more cards.
@@ -56,11 +56,11 @@ Before discussing Ring-Attention, we need to briefly talk about Flash-Attention.
 
 > QKV and softmax can perform block-wise parallel computation and updates, maximizing the utilization of SRAM while reducing memory usage.
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/b3e6acfb.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/b3e6acfb.png)
 
 Pseudocode for flash-attention forward process:
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/58824543.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/58824543.png)
 
 Note the pseudocode in lines 10~12 of Algorithm1 above, this part performs merged updates on the block-wise _LSE_ (_log-sum-exp_):
 
@@ -74,7 +74,7 @@ So, if each card carries a portion of the sequence length and computation result
 
 > Ring-Attention: Utilizing the principle that Attention computation can be performed in blocks, sequence blocks are split across multiple cards for separate computation, and then the computation results are merged to obtain the final result.
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/2deb45c8.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/2deb45c8.png)
 
 Assuming there are N blocks, consider the same Q~i~ and K~0~n-1~ V~0~n-1~ that can communicate and flow between different blocks. First consider the Softmax part:
 
@@ -150,11 +150,11 @@ Good, we have prepared the theory above and can now start implementing the code.
 
 Note that Ring-Attention has multiple variant implementations, such as strip-ring-attention[3]. Among these implementations, the zigzag implementation is the most excellent in terms of load balancing. To understand the problem with the original Ring-Attention, let's look at the following figure:
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/51ce37ef.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/51ce37ef.png)
 
 Since GPU 0 processes the front part of the sentence, when KV from other cards flows to GPU 0, the GPU cannot participate in computing the latter part of the sentence due to causal=True, while GPU 3 can compute the entire sequence from 0 to 2. Therefore, the computational load on each card is not consistent. Under this premise, Megatron-CP and some excellent implementations adopt zigzag partitioning:
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/984002ae.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/984002ae.png)
 
 Assuming we need to partition across 4 cards, then under the condition that the sequence can be evenly divided into 8 pieces, we combine 0/7 together, 1/6 together, 2/5 and 3/4 respectively together. This ensures balanced computation. Moreover, this computation has another characteristic:
 
@@ -164,7 +164,7 @@ Assuming we need to partition across 4 cards, then under the condition that the 
 
 3. When the flow sequence number is greater than the current rank, only the second half of Q needs to be computed
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/06037e80.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/06037e80.png)
 
 This further reduces the computational load. For code implementation, see:
 
@@ -194,7 +194,7 @@ The framework will automatically calculate the partitioning method, and can even
 
 The most natural approach is to first use Ulysses for local gather, then use Ring-Attention globally to compute global LSE and Attention-Out. Assuming partitioning into 4 subsequences (Ulysses world_size=2, Ring-Attention world_size=2), with model head=4:
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/4345df6f.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/4345df6f.png)
 
 After Ulysses all-to-all communication, GPU0 and GPU1 as the same Ulysses group both hold sequences 0/3, but with different heads (first half and second half). GPU2 and GPU3 are similar. During Ring-Attention computation, GPU0 and GPU2 form a Ring-Attention group for ring communication, and GPU1 and GPU3 are similar.
 
@@ -216,7 +216,7 @@ To adapt multimodal partitioning, SWIFT adopts an engineering trick during imple
 
 Padding-free can be understood as input format in flash-attention form: multiple sequences concatenated into one super-long sequence.
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Ulysses_Ring_Attention/resources/c81d72f5.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Ulysses_Ring_Attention/resources/c81d72f5.png)
 
 This approach brings trouble to actual engineering implementation. Therefore, in the implementation, SWIFT adopts the following engineering solution:
 

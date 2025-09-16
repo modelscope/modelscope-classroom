@@ -46,10 +46,10 @@
 
 ### 需求分布
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/f44301e4.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/f44301e4.png)
 
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/d4502859.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/d4502859.png)
 ## 三.Deep Research Agent核心技术架构
 
 ### 架构&工作流
@@ -62,7 +62,7 @@
 
 静态工作流的优势在于结构清晰且易于实现，由于每个阶段任务的覆盖面不大，开发者更容易设计良好的容错机制，避免模型能力的不稳定导致整个工作链路崩溃，在对于任务交付稳定性要求高、难度不大、链路较长的场景下有一定的优势；其劣势在于泛化能力较为有限，固定的处理步骤导致了工作流无法有效的迁移到不同的任务场景，例如面对如金融、计算机等不同领域的工作时，很可能需要分别定制不同的pipeline。
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/bc13d8c6.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/bc13d8c6.png)
 
 #### 动态工作流
 
@@ -74,7 +74,7 @@
 
 更进一步地，动态工作流可以细分为单智能体（single-agent）架构与多智能体（multi-agent）架构。
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/78ae17bc.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/78ae17bc.png)
 
 ##### 单智能体架构
 
@@ -120,7 +120,7 @@
 
 在本地或者沙箱环境运行的浏览器中直接模拟人类操作，模拟点击、滚动、填写表单、执行JS等操作，实时提取网页内容。下图为ChatGPT agent模式下使用沙箱浏览器进行检索的示意图。
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/5e3918d8.png)![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/0f21a71a.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/5e3918d8.png)![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/0f21a71a.png)
 
 主要缺点：资源消耗较大、延迟较高，解析动态的、种类繁多的网页内容容易遇到瓶颈。
 
@@ -220,7 +220,7 @@
 
 **3）工作流程**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/79f19288.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/79f19288.png)
 
 *   **query与参数输入**：
     
@@ -302,7 +302,7 @@
 
 **3）工作流程**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/89cc2348.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/89cc2348.png)
 
 *   **coordinater判断**：
     
@@ -503,7 +503,7 @@
 
 **3）工作流程**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/1cbe3654.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/1cbe3654.png)
 
 *   **研究范围->确认研究意图**
     
@@ -511,7 +511,7 @@
         
     *   研究概要生成：生成一段涵盖研究问题、调研要求、调研思路、报告要求之类的重点概要，作为研究全程需要参考的概要。
         
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/72e200de.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/72e200de.png)
         
 *   **执行研究->获取上下文**
     
@@ -525,13 +525,13 @@
             
     *   Research Supervisor Iteration：基于Sub-Agents的findings和研究概要进行反思，确定是否需要进一步的信息收集，需要的话产生子主题并分发，直到任务完成。
         
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/0c5d2974.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/0c5d2974.png)
         
 *   **撰写报告->形成产出**
     
     *   基于前述过程所积累的findings和最初的研究概要，直接生成最终报告。
         
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/5ec2e8ab.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/5ec2e8ab.png)
         
 
 ##### 核心特性
@@ -547,7 +547,7 @@
     
 *   **tool-calling循环与workflow需要trade-off：**需要实验验证两者的比例和设计方式，从当前工作给出的结论来看，在sub-agent这一层级放开了模型自主进行tool calling，全局仍然保持了supervisor做规划、反思是可以更好兼顾稳定与灵活的，是一种静态workflow和LLM自主tool calling循环的合理trade-off。即在一个小而聚焦的任务上由子任务智能体完全接管，在全局层面人为定义流程。
     
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/00e69df5.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/00e69df5.png)
         
 *   **multi-agent之间的信息不通、结果连贯性问题可以通过替换中间交付内容的办法来解决：**作者的博客里面提到，如果让每个sub-agent独立完整一个章节再尝试合并，会很难协调连贯性；但是如果让sub-agent只交付搜索、整理得到的信息，让最后的report生成agent来写文章，连贯性问题就会得到解决。
     
@@ -583,7 +583,7 @@
 
 **3）工作流程**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/42cc10f1.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/42cc10f1.png)
 
 *   **Open Search Tool流程**
     

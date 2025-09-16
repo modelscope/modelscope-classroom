@@ -46,8 +46,8 @@ Note that this article is not a comprehensive survey and may not cover all aspec
 
 ### Demand Distribution
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/f44301e4.png)
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/d4502859.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/f44301e4.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/d4502859.png)
 ## III. Core Technical Architecture of Deep Research Agent
 
 ### Architecture & Workflow
@@ -60,7 +60,7 @@ Static workflow primarily relies on human-defined task pipelines. For example, a
 
 The advantages of static workflow lie in its clear structure and ease of implementation. Since each stage covers a limited scope of tasks, developers can more easily design good fault tolerance mechanisms to avoid the collapse of the entire workflow chain due to model capability instability. This approach has certain advantages in scenarios that require high task delivery stability, are not overly difficult, and have longer chains. Its disadvantages lie in limited generalization capability, as fixed processing steps prevent the workflow from effectively transferring to different task scenarios. For example, when facing work in different domains such as finance and computer science, it may be necessary to customize different pipelines separately.
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/bc13d8c6.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/bc13d8c6.png)
 
 #### Dynamic Workflow
 
@@ -72,7 +72,7 @@ In fact, in engineering practice, static pipelines and dynamic autonomous planni
 
 Furthermore, dynamic workflow can be subdivided into single-agent architecture and multi-agent architecture.
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/78ae17bc.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/78ae17bc.png)
 
 ##### Single-Agent Architecture
 
@@ -117,7 +117,7 @@ Main disadvantages: Limited by the functionality provided by APIs and the format
 
 Directly simulating human operations in browsers running locally or in sandbox environments, simulating clicks, scrolling, form filling, JavaScript execution, and real-time extraction of webpage content. The figure below shows a schematic diagram of using sandbox browsers for retrieval in ChatGPT agent mode.
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/5e3918d8.png)![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/0f21a71a.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/5e3918d8.png)![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/0f21a71a.png)
 
 Main disadvantages: High resource consumption, high latency, and parsing dynamic, diverse webpage content is prone to bottlenecks.
 
@@ -211,7 +211,7 @@ Optimizes agent capabilities through continuous interaction to improve external 
 
 **3) Workflow**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/79f19288.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/79f19288.png)
 
 *   **Query and Parameter Input**:
     
@@ -291,7 +291,7 @@ Optimizes agent capabilities through continuous interaction to improve external 
 
 **3) Workflow**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/89cc2348.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/89cc2348.png)
 
 *   **Coordinator Judgment**:
     
@@ -486,7 +486,7 @@ Optimizes agent capabilities through continuous interaction to improve external 
 
 **3) Workflow**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/1cbe3654.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/1cbe3654.png)
 
 *   **Research Scope -> Confirm Research Intent**
     
@@ -494,7 +494,7 @@ Optimizes agent capabilities through continuous interaction to improve external 
         
     *   Research Summary Generation: Generates a summary covering research questions, research requirements, research approach, report requirements, etc., serving as a key summary to reference throughout the research process.
         
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/72e200de.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/72e200de.png)
         
 *   **Execute Research -> Obtain Context**
     
@@ -508,13 +508,13 @@ Optimizes agent capabilities through continuous interaction to improve external 
             
     *   Research Supervisor Iteration: Reflects based on Sub-Agents' findings and research summary to determine whether further information collection is needed. If needed, generates sub-topics and distributes them until the task is completed.
         
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/0c5d2974.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/0c5d2974.png)
         
 *   **Write Report -> Form Output**
     
     *   Based on the findings accumulated from the aforementioned process and the initial research summary, directly generates the final report.
         
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/5ec2e8ab.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/5ec2e8ab.png)
         
 
 ##### Core Features
@@ -528,7 +528,7 @@ Optimizes agent capabilities through continuous interaction to improve external 
     
 *   **Trade-off needed between tool-calling loops and workflow:** Experiments are needed to verify the proportion and design approach of both. From the conclusions given by current work, allowing models to autonomously perform tool calling at the sub-agent level while maintaining supervisor planning and reflection at the global level can better balance stability and flexibility, representing a reasonable trade-off between static workflow and LLM autonomous tool calling loops. That is, having sub-task agents take complete control over small and focused tasks, while artificially defining processes at the global level.
     
-    *   ![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/00e69df5.png)
+    *   ![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/00e69df5.png)
         
 *   **Information isolation and result coherence issues among multi-agents can be solved by replacing intermediate deliverable content:** The author's blog mentions that if each sub-agent independently completes a chapter and then attempts to merge them, it would be very difficult to coordinate coherence; however, if sub-agents only deliver searched and organized information, letting the final report generation agent write the article, the coherence problem would be resolved.
     
@@ -564,7 +564,7 @@ Optimizes agent capabilities through continuous interaction to improve external 
 
 **3) Workflow**
 
-![image.png](https://github.com/modelscope/modelscope-classroom/blob/main/Blogs/Articles/Deep-Research-Survey/resources/42cc10f1.png)
+![image.png](https://raw.githubusercontent.com/modelscope/modelscope-classroom/main/Blogs/Articles/Deep-Research-Survey/resources/42cc10f1.png)
 
 *   **Open Search Tool Process**
     
