@@ -269,12 +269,11 @@ KTO引入了前景理论（prospect theory），该理论解释了为什么人�
 前景理论中，Tversky & Kahneman 用以下效用方程建模了人类价值
 
 $$
-v(z, z_{\text{ref}};\alpha, \lambda) = \left\{
-    \begin{array}{ll}
+v(z, z_{\text{ref}};\alpha, \lambda) =
+    \begin{cases}
         (z - z_{\text{ref}})^{\alpha} & \quad \text{if } z \geq z_{\text{ref}} \\
         -\lambda(z_{\text{ref}} - z)^{\alpha} & \quad \text{if } z < z_{\text{ref}}
-    \end{array}
-\right.
+    \end{cases}
 $$
 
 价值函数 $v:z \to R$ 将一个输出 $z$ 相对一个参考值 $z_{\text{ref}}$ 映射到其感知(或者说主观)价值，反应了人类相比起相同大小回报，对损失的敏感性更大
