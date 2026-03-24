@@ -8,6 +8,7 @@
 另外，我们新增了Blogs板块，为大家带来前沿技术的深度分析。
 
 ## 🌿更新日志
+- ⭐️**2025.12.17** 添加了llama.cpp部署Qwen3vl GGUF的使用样例，请查看[Llama.cpp样例](./LLM-tutorial/notebook/llamacpp+qwen3vl+gguf.ipynb).
 - ⭐️**2025.09.16** 增加了**超长序列并行之Ulysses+Ring-Attention技术原理与实现**. 请查看[这里](Blogs/Articles/Ulysses_Ring_Attention/report.md).
 - ⭐️**2025.09.16** 增加了**DeepResearch技术综述**. 请查看[这里](Blogs/Articles/Deep-Research-Survey/report.md).
 - ⭐️**2025.09.16** 增加了**All2All全模态大模型技术综述**. 请查看[这里](Blogs/Articles/All2All-Survey/report.md).
