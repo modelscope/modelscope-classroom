@@ -1,6 +1,6 @@
 # 实践：编写一个MCP Server
 
-本节将实现一个完整的MCP Server，提供文件操作和命令执行功能，展示如何按照MCP协议规范构建工具服务。
+前面在工具与 MCP 协议一节中，我们用“大厨与厨具供应商”的比喻理解了 MCP 的架构。现在我们换一个角色——这次你不是大厨，而是厨具供应商。你要按照 MCP 规范制作一套工具，让任何支持 MCP 的智能体都能直接使用。本节将实现一个提供文件操作和命令执行功能的完整 MCP Server。
 
 ## 项目目标
 
@@ -26,6 +26,8 @@ mcp_file_server/
 ## 核心实现
 
 ### MCP协议基础
+
+最核心的部分是 `MCPServer` 类。它的职责很简单：接收 JSON-RPC 请求，根据方法名分发到对应的处理函数，返回结果。就像前台接待员——客人（Client）说“我要看看你们有什么工具”（tools/list），前台就去取工具清单；客人说“帮我用某工具处理某事”（tools/call），前台就转交给后台师傅。
 
 ```python
 # server.py
@@ -202,6 +204,8 @@ class MCPServer:
 
 ### 文件系统工具
 
+现在来实现具体的工具。文件系统操作是最实用的 MCP 工具之一。特别注意 `_safe_path` 函数——这是安全设计的核心，确保所有操作都限制在指定目录内，防止智能体意外访问系统其他文件。这就像给实习生发了一张门禁卡，只能进特定的房间：
+
 ```python
 # handlers/filesystem.py
 import os
@@ -290,6 +294,8 @@ def create_directory(path: str) -> str:
 
 ### Shell命令工具
 
+Shell 命令执行是一个强大但危险的能力——就像给实习生一把大型切割设备，必须严格限制使用范围。这里采用命令白名单机制，只允许执行安全的只读命令：
+
 ```python
 # handlers/shell.py
 import subprocess
@@ -353,6 +359,8 @@ def execute_command(command: str, timeout: int = 30) -> dict:
 ```
 
 ### 组装Server
+
+最后一步是把所有工具注册到 Server 上。注意每个工具的 `schema` 定义——这就是前面讲过的“工具说明书”，它告诉 Client 每个工具接受什么参数、格式是什么。写得越清楚，Agent 使用时犯错的概率就越低：
 
 ```python
 # main.py
@@ -456,6 +464,8 @@ if __name__ == "__main__":
 
 ## 测试Server
 
+写完代码后，如何验证它是否能正常工作？最直接的方式是手动发送 JSON-RPC 请求。这就像厨具出厂前的质检环节——逐个测试每个接口是否返回正确结果。
+
 ### 手动测试
 
 ```bash
@@ -473,6 +483,8 @@ echo '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"list_direc
 ```
 
 ### Python测试脚本
+
+对于更系统化的测试，可以写一个测试脚本。它模拟了 Client 的角色，依次测试初始化、工具列表、工具调用等操作：
 
 ```python
 # test_server.py
@@ -523,7 +535,7 @@ print("Write:", resp)
 
 ## 与Claude Desktop集成
 
-将Server配置到Claude Desktop：
+开发完成后，最激动人心的时刻来了——把你的 Server 接入真实的智能体应用。将 Server 配置到 Claude Desktop 只需一个 JSON 配置文件：
 
 ```json
 // ~/.config/claude/claude_desktop_config.json (Linux/Mac)
@@ -538,4 +550,4 @@ print("Write:", resp)
 }
 ```
 
-通过这个实践，你已经掌握了MCP Server的完整开发流程，可以根据需要扩展更多工具和资源。
+回顾本节，我们完整地走过了 MCP Server 的开发流程：定义协议处理框架、实现具体工具、组装注册、测试验证、集成应用。其中最关键的经验是：工具描述要清晰（决定了 Agent 能否正确使用），安全措施要到位（路径限制、命令白名单）。你可以以此为基础，扩展更多工具和资源——每个新工具都是智能体能力的一次升级。

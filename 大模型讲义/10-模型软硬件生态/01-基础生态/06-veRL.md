@@ -2,6 +2,8 @@
 
 veRL是字节跳动开源的大模型强化学习训练框架，专注于RLHF（Reinforcement Learning from Human Feedback）和基于强化学习的模型对齐训练。
 
+为什么需要专门的RLHF框架？因为RLHF的工程复杂度远超普通的SFT微调。一次训练过程中，你需要同时维护四个模型（Actor、Critic、Reward Model、Reference Model），它们之间有复杂的数据流交互，还要在多张GPU上合理分配显存。如果手写这套流程，光是协调四个模型的显存分配就够头疼的了。veRL把这些工程细节封装好，让你专注于算法和奖励设计。
+
 ## 概述
 
 veRL的设计目标是提供一个高效、灵活的大模型强化学习训练解决方案。与传统的RLHF实现相比，veRL强调：
@@ -122,7 +124,7 @@ for iteration in range(num_iterations):
 
 ### GRPO训练
 
-veRL支持Group Relative Policy Optimization（GRPO）：
+veRL支持Group Relative Policy Optimization（GRPO），这是一种不需要Critic模型的轻量级替代方案。在实际中这意味着什么？少维护一个模型，显存压力小很多，特别适合显存有限的场景：
 
 ```python
 from verl import GRPOTrainer
@@ -188,7 +190,7 @@ def compute_rewards(responses, prompts):
 
 ### 规则奖励
 
-支持自定义规则奖励函数：
+支持自定义规则奖励函数。在实际项目中，纯奖励模型往往不够用——你可能还希望模型的回答不要太长、符合特定格式、或者不包含敏感词。这时候可以用规则奖励来补充：
 
 ```python
 def rule_based_reward(response: str) -> float:
@@ -307,4 +309,4 @@ if kl_divergence > config.max_kl:
 - **策略熵**：探索程度
 - **优势估计方差**：训练稳定性
 
-veRL为大模型强化学习训练提供了高效的解决方案。通过合理的架构设计和优化，它能够支持百亿参数级模型的RLHF训练。对于需要进行强化学习对齐的团队，veRL是一个值得考虑的选择。
+veRL为大模型强化学习训练提供了高效的解决方案。通过合理的架构设计和优化，它能够支持百亿参数级模型的RLHF训练。对于刚接触RLHF的团队，建议先用GRPO起步——不需要Critic模型，显存压力小，调试也更容易。等熟悉了整个流程后，再尝试完整的PPO训练也不迟。
