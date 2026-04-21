@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Scan 大模型讲义 directory and generate content-index.json for the web viewer."""
+"""Scan 大模型教程 directory and generate content-index.json for the web viewer."""
 import os
 import json
 import re
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CONTENT_DIR = os.path.join(SCRIPT_DIR, '..', '大模型讲义')
+CONTENT_DIR = os.path.join(SCRIPT_DIR, '..', '大模型教程')
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, 'content-index.json')
 
 

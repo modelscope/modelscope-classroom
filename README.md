@@ -8,7 +8,7 @@
 另外，我们新增了Blogs板块，为大家带来前沿技术的深度分析。
 
 ## 🌿更新日志
-- ⭐️**2026.04.21** 新增**大模型讲义**，涵盖完整的大模型理论与实践课程，包括深度学习基础、模型训练推理、强化学习、智能体技术等13个章节，请查看[大模型讲义](./大模型讲义).
+- ⭐️**2026.04.21** 新增**大模型教程**，涵盖完整的大模型理论与实践课程，包括深度学习基础、模型训练推理、强化学习、智能体技术等13个章节，请查看[大模型教程](./大模型教程).
 - ⭐️**2025.12.17** 添加了llama.cpp部署Qwen3vl GGUF的使用样例，请查看[Llama.cpp样例](./LLM-tutorial/notebook/llamacpp+qwen3vl+gguf.ipynb).
 - ⭐️**2025.09.16** 增加了**超长序列并行之Ulysses+Ring-Attention技术原理与实现**. 请查看[这里](Blogs/Articles/Ulysses_Ring_Attention/report.md).
 - ⭐️**2025.09.16** 增加了**DeepResearch技术综述**. 请查看[这里](Blogs/Articles/Deep-Research-Survey/report.md).

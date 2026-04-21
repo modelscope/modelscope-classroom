@@ -105,8 +105,8 @@ function renderWelcome() {
 
     document.getElementById('content').innerHTML = `
         <div class="welcome-hero">
-            <img class="welcome-banner" src="${CONTENT_BASE}大模型讲义/title_image.png" alt="大模型技术基础：数学、训练与智能体">
-            <h1>大模型讲义</h1>
+            <img class="welcome-banner" src="${CONTENT_BASE}大模型教程/title_image.png" alt="大模型技术基础：数学、训练与智能体">
+            <h1>大模型教程</h1>
             <p>涵盖完整的大模型理论与实践课程，从深度学习基础到智能体前沿技术</p>
             <div class="welcome-stats">
                 <div><span>${chs.length}</span> 章节</div>
@@ -123,7 +123,7 @@ function renderWelcome() {
         </div>`;
 
     updateActiveNav(null);
-    document.title = '大模型讲义 — ModelScope Classroom';
+    document.title = '大模型教程 — ModelScope Classroom';
 }
 
 function openChapterFirst(chapterId) {
@@ -235,7 +235,7 @@ async function loadContent(filePath) {
 
         // Update title
         const h1 = article.querySelector('h1');
-        document.title = (h1 ? h1.textContent + ' — ' : '') + '大模型讲义';
+        document.title = (h1 ? h1.textContent + ' — ' : '') + '大模型教程';
 
     } catch (err) {
         contentEl.innerHTML = `<div class="error-msg">加载失败：${err.message}<br><br>

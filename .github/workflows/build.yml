@@ -36,7 +36,7 @@ jobs:
       run: python web/build_index.py
 
     - name: Copy lecture content into web directory
-      run: cp -r 大模型讲义 web/大模型讲义
+      run: cp -r 大模型教程 web/大模型教程
 
     - name: Upload artifact
       id: upload
