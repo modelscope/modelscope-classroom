@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  pull_request:
+    branches: ['main']
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: 'The ID of the uploaded artifact'
+        value: ${{ jobs.build.outputs.artifact-id }}
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Build content index
+      run: python web/build_index.py
+
+    - name: Copy lecture content into web directory
+      run: cp -r 大模型讲义 web/大模型讲义
+
+    - name: Upload artifact
+      id: upload
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: ./web
