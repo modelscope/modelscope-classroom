@@ -95,7 +95,13 @@ $$\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)$$
 $$\max_\theta \mathbb{E} \left[ \frac{\pi_\theta(a|s)}{\pi_{\theta_{\text{old}}}(a|s)} A^{\pi_{\theta_{\text{old}}}}(s, a) \right]$$
 $$\text{s.t.} \quad \mathbb{E}[D_{\text{KL}}(\pi_{\theta_{\text{old}}} \| \pi_\theta)] \leq \delta$$
 
-**PPO**：用裁剪代替约束，实现更简单高效的信任域更新。
+其中：
+- $\frac{\pi_\theta(a|s)}{\pi_{\theta_{\text{old}}}(a|s)}$ 为重要性采样比率，将旧策略的数据修正为新策略的期望
+- $A^{\pi_{\theta_{\text{old}}}}(s, a)$ 为用旧策略估计的优势函数
+- $D_{\text{KL}}(\pi_{\theta_{\text{old}}} \| \pi_\theta)$ 为新旧策略之间的 KL 散度
+- $\delta$ 为信任域半径，限制每次更新的幅度
+
+TRPO 的核心思想是“保守更新”——每次策略更新不能偏离旧策略太远（KL 约束），以防止一步走太大导致性能崩溃。PPO 用更简单的裁剪机制近似实现了类似效果。
 
 ### Policy-Based 的局限
 
@@ -222,6 +228,14 @@ $$\log \pi_\theta(a|s) = -\frac{(a - \mu)^2}{2\sigma^2} - \log \sigma - \frac{1}
 Off-policy 学习的关键技术是**重要性采样**（Importance Sampling）：
 
 $$\mathbb{E}_{a \sim \pi_b} \left[ \frac{\pi_\theta(a|s)}{\pi_b(a|s)} A(s, a) \right] = \mathbb{E}_{a \sim \pi_\theta} [A(s, a)]$$
+
+其中：
+- $\pi_b$ 为行为策略（采集数据的策略）
+- $\pi_\theta$ 为目标策略（待优化的策略）
+- $\frac{\pi_\theta(a|s)}{\pi_b(a|s)}$ 为重要性权重（importance weight），修正分布差异
+- 等式左边可以用旧策略的数据计算，右边是新策略下的真实期望
+
+重要性采样的本质是“用别人的经验学习自己的策略”。如果新策略下某动作概率比旧策略高（权重 > 1），说明新策略更偏好这个动作，其经验应被放大；反之则缩小。但当新旧策略差异太大时，权重可能极端，导致方差爆炸——这正是 PPO 裁剪要解决的问题。
 
 用行为策略 $\pi_b$ 的数据估计目标策略 $\pi_\theta$ 的期望。
 

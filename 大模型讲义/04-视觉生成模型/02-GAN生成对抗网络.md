@@ -2,7 +2,7 @@
 
 **生成对抗网络**（Generative Adversarial Network, GAN）由 Goodfellow 等人于 2014 年提出，开创了深度生成模型的新范式。GAN 通过生成器和判别器的对抗博弈，隐式地学习数据分布。虽然在图像生成领域已被扩散模型超越，但 GAN 的对抗训练思想仍在判别器设计、超分辨率、图像编辑等领域发挥作用。
 
-想象一下这样一个场景：一位伪造币的造假者和一位银行的鉴定师展开了持久的较量。造假者不断改进印刷技术，试图让假币以假乱真；鉴定师则磨练眼力，努力分辨每一张铞票的真伪。随着博弈的深入，造假者的技术越来越精湛，鉴定师也越来越历害。最终，当伪造的铞票与真铞完全无法区分时，博弈就达到了平衡。GAN 的工作原理与此如出一辙。
+想象一下这样一个场景：一位伪造币的造假者和一位银行的鉴定师展开了持久的较量。造假者不断改进印刷技术，试图让假币以假乱真；鉴定师则磨练眼力，努力分辨每一张钞票的真伪。随着博弈的深入，造假者的技术越来越精湛，鉴定师也越来越厉害。最终，当伪造的钞票与真铞完全无法区分时，博弈就达到了平衡。GAN 的工作原理与此如出一辙。
 
 ## 4.2.1 对抗训练框架
 
@@ -21,13 +21,23 @@ graph TD
 
 GAN 包含两个网络：
 
-**生成器**（Generator, $G$）：从噪声 $\mathbf{z} \sim p_z(\mathbf{z})$ 生成数据 $G(\mathbf{z})$——这就是造假者，从一堆随机的原材料中印刷出"铞票"。
+**生成器**（Generator, $G$）：从噪声 $\mathbf{z} \sim p_z(\mathbf{z})$ 生成数据 $G(\mathbf{z})$——这就是造假者，从一堆随机的原材料中印刷出"钞票"。
 
-**判别器**（Discriminator, $D$）：判断输入是真实数据还是生成数据——这就是鉴定师，检查每张铞票的真伪。
+**判别器**（Discriminator, $D$）：判断输入是真实数据还是生成数据——这就是鉴定师，检查每张钞票的真伪。
 
 两者进行**极小极大博弈**（minimax game）：
 
 $$\min_G \max_D V(D, G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}}[\log D(\mathbf{x})] + \mathbb{E}_{\mathbf{z} \sim p_z}[\log(1 - D(G(\mathbf{z})))]$$
+
+其中：
+- $G$ 为生成器网络，将随机噪声 $\mathbf{z}$ 映射为生成样本 $G(\mathbf{z})$
+- $D$ 为判别器网络，输出输入来自真实数据的概率 $D(\mathbf{x}) \in [0, 1]$
+- $p_{\text{data}}$ 为真实数据分布
+- $p_z$ 为噪声先验分布，通常取标准正态 $\mathcal{N}(\mathbf{0}, \mathbf{I})$ 或均匀分布
+- $\mathbb{E}_{\mathbf{x} \sim p_{\text{data}}}[\log D(\mathbf{x})]$ 为判别器对真实样本的识别能力
+- $\mathbb{E}_{\mathbf{z} \sim p_z}[\log(1 - D(G(\mathbf{z})))]$ 为判别器拒绝生成样本的能力
+
+这个极小极大目标的含义是：判别器希望 $V$ 尽可能大（精确区分真假），生成器希望 $V$ 尽可能小（骗过判别器）。第一项鼓励判别器对真实数据输出高分，第二项鼓励判别器对生成数据输出低分。当判别器无法区分二者时，$D(\mathbf{x}) = 0.5$，博弈达到纳什均衡。
 
 ### 博弈论视角
 
@@ -98,11 +108,26 @@ GAN 训练的主要挑战是**不稳定性**：
 
 $$W(p_r, p_g) = \inf_{\gamma \in \Pi(p_r, p_g)} \mathbb{E}_{(\mathbf{x}, \mathbf{y}) \sim \gamma}[\|\mathbf{x} - \mathbf{y}\|]$$
 
-Wasserstein 距离有一个直观的解释：想象一堆泥土堆在地上，你要把它掐成另一个形状，Wasserstein 距离就是这个"搐泥工程"所需的最小总搬运量（土方量 × 搬运距离）。与 JS 散度相比，它的优势在于：即使两个分布完全不重叠，Wasserstein 距离仍然能提供有意义的梯度。回想一下模式坍缩的困境——JS 散度在分布不重叠时直接返回常数，造假者收不到任何有用反馈；Wasserstein 距离则始终告诉他"你还差多远"。
+其中：
+- $p_r$ 为真实数据分布，$p_g$ 为生成器诱导的分布
+- $\Pi(p_r, p_g)$ 为边缘分布分别为 $p_r$ 和 $p_g$ 的所有联合分布（传输计划）的集合
+- $\gamma(\mathbf{x}, \mathbf{y})$ 表示将 $\mathbf{x}$ 处的质量搬运到 $\mathbf{y}$ 处的方案
+- $\|\mathbf{x} - \mathbf{y}\|$ 为搬运距离（成本）
+- $\inf$ 表示在所有可行搬运方案中取最优（总成本最小）
+
+Wasserstein 距离有一个直观的解释：想象一堆泥土堆在地上，你要把它掐成另一个形状，Wasserstein 距离就是这个"捏泥工程"所需的最小总搬运量（土方量 × 搬运距离）。与 JS 散度相比，它的优势在于：即使两个分布完全不重叠，Wasserstein 距离仍然能提供有意义的梯度。回想一下模式坍缩的困境——JS 散度在分布不重叠时直接返回常数，造假者收不到任何有用反馈；Wasserstein 距离则始终告诉他"你还差多远"。
 
 实践中通过 Lipschitz 约束的对偶形式实现：
 
 $$\max_{\|D\|_L \leq 1} \mathbb{E}_{\mathbf{x} \sim p_r}[D(\mathbf{x})] - \mathbb{E}_{\mathbf{x} \sim p_g}[D(\mathbf{x})]$$
+
+其中：
+- $\|D\|_L \leq 1$ 表示判别器（此处称为“critic”）必须满足 1-Lipschitz 约束，即函数变化率不超过 1
+- $\mathbb{E}_{\mathbf{x} \sim p_r}[D(\mathbf{x})]$ 为 critic 对真实样本的平均评分
+- $\mathbb{E}_{\mathbf{x} \sim p_g}[D(\mathbf{x})]$ 为 critic 对生成样本的平均评分
+- 两者之差即为 Wasserstein 距离的 Kantorovich-Rubinstein 对偶形式
+
+说白了，WGAN 将判别器重新定义为“评分员”（critic），不再输出概率，而是对真假样本打分。Lipschitz 约束保证评分函数足够“平滑”，不会在某些区域急剧变化。关键优势在于：即使 $p_r$ 和 $p_g$ 的支撑完全不重叠，梯度仍然有意义，从根本上解决了原始 GAN 的梯度消失问题。
 
 WGAN 提供了有意义的损失度量，训练更稳定。
 
@@ -112,7 +137,14 @@ WGAN 提供了有意义的损失度量，训练更稳定。
 
 $$\mathcal{L} = \mathbb{E}[D(G(\mathbf{z}))] - \mathbb{E}[D(\mathbf{x})] + \lambda \mathbb{E}[(\|\nabla_{\hat{\mathbf{x}}} D(\hat{\mathbf{x}})\|_2 - 1)^2]$$
 
-其中 $\hat{\mathbf{x}}$ 是真假样本之间的插值。
+其中：
+- 前两项为 WGAN 的 critic 损失（注意符号：此处从 critic 角度写，目标是最小化，因此生成样本分数在前）
+- $\hat{\mathbf{x}} = t \cdot \mathbf{x} + (1-t) \cdot G(\mathbf{z})$，$t \sim U(0,1)$，为真实样本与生成样本之间的随机插值
+- $\|\nabla_{\hat{\mathbf{x}}} D(\hat{\mathbf{x}})\|_2$ 为 critic 在插值点处的梯度范数
+- $\lambda$ 为梯度惩罚系数，通常取 10
+- 第三项惩罚梯度范数偏离 1 的程度，以此近似强制 1-Lipschitz 约束
+
+为什么不直接裁剪权重？因为粗暴裁剪会严重限制 critic 的表达能力。梯度惩罚是一种“软”约束：不强制处处满足 Lipschitz 条件，而是在数据流形的关键区域（插值路径）上惩罚违反者。实践表明这比权重裁剪更稳定、性能更好。
 
 ### StyleGAN
 
@@ -205,11 +237,17 @@ GAN 在某些场景仍有优势：
 
 $$\text{IS} = \exp\left(\mathbb{E}_{\mathbf{x}}[D_{\text{KL}}(p(y|\mathbf{x}) \| p(y))]\right)$$
 
-用 Inception 网络评估生成图像的质量和多样性。分数越高越好。直观理解：如果每张生成图都能被分类器明确地认出是"狗"或"船"（质量好），而且所有生成图涵盖了很多不同类别（多样性好），IS 分数就会很高。反之，如果生成的图片模糊不清或只生成了同一类物体，分数就会很低。
+用 Inception 网络评估生成图像的质量和多样性，分数越高越好。其含义是：如果每张生成图都能被分类器明确识别（质量好），而且所有生成图涵盖丰富类别（多样性好），IS 分数就会很高。反之，图片模糊或只生成单一类别，分数就会很低。
 
 ### Fréchet Inception Distance (FID)
 
 $$\text{FID} = \|\boldsymbol{\mu}_r - \boldsymbol{\mu}_g\|^2 + \text{Tr}(\boldsymbol{\Sigma}_r + \boldsymbol{\Sigma}_g - 2(\boldsymbol{\Sigma}_r \boldsymbol{\Sigma}_g)^{1/2})$$
+
+其中：
+- $\boldsymbol{\mu}_r, \boldsymbol{\Sigma}_r$ 为真实图像在 Inception 特征空间中的均值和协方差矩阵
+- $\boldsymbol{\mu}_g, \boldsymbol{\Sigma}_g$ 为生成图像在同一特征空间中的均值和协方差矩阵
+- $\text{Tr}(\cdot)$ 为矩阵的迹（对角元素之和）
+- 第一项衡量分布中心的偏移，第二项衡量分布形状的差异
 
 比较真实图像和生成图像在 Inception 特征空间的分布距离。分数越低越好。举个例子：如果把真实图像的特征分布看作一张城市地图的地标分布，FID 就是衡量生成图像的地标分布与真实地标之间的"偏移度"：平均位置偏了多少，离散程度差了多少。
 
