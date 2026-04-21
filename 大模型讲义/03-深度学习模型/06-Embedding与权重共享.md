@@ -88,6 +88,8 @@ $$P(w | \text{context}) = \text{softmax}(\mathbf{W}_o \mathbf{h} + \mathbf{b}_o)
 
 $$\text{softmax}(\mathbf{z})_i = \frac{\exp(z_i)}{\sum_{j=1}^V \exp(z_j)}$$
 
+其中 $z_i$ 是词表中第 $i$ 个 token 的原始分数（logit），$V$ 是词表大小。翻译成人话就是：softmax 将任意实数向量变换为归一化的概率分布，使得模型输出可解释为"预测每个 token 的概率"。
+
 对于大词表（$V = 100,000$），计算 softmax 需要对 100,000 个元素求指数和归一化，计算量可观。这也是训练大词表模型的瓶颈之一。
 
 ### 数值稳定性
@@ -96,7 +98,7 @@ $$\text{softmax}(\mathbf{z})_i = \frac{\exp(z_i)}{\sum_{j=1}^V \exp(z_j)}$$
 
 $$\text{softmax}(\mathbf{z})_i = \frac{\exp(z_i - \max_j z_j)}{\sum_{j=1}^V \exp(z_j - \max_j z_j)}$$
 
-这在数学上等价，但数值稳定。
+其中 $\max_j z_j$ 是所有 logit 中的最大值。背后的含义是：减去最大值后，指数函数的输入均为非正数，避免了 $\exp$ 对大正数的溢出，同时保证最终结果与原式在数学上完全等价。
 
 ## 3.6.4 权重共享（Tied Embeddings）
 

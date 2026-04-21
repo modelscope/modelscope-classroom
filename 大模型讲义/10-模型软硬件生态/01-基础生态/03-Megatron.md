@@ -43,6 +43,8 @@ Megatron的张量并行将模型层的权重切分到多个GPU上，主要针对
 
 $$\mathbf{Y} = \mathbf{X}\mathbf{W} = \mathbf{X}[\mathbf{W}_1, \mathbf{W}_2] = [\mathbf{X}\mathbf{W}_1, \mathbf{X}\mathbf{W}_2]$$
 
+其中 $\mathbf{X} \in \mathbb{R}^{b \times d}$ 为输入矩阵（$b$ 为 batch × seq 长度，$d$ 为隐藏维度），$\mathbf{W} \in \mathbb{R}^{d \times k}$ 为完整权重矩阵，$\mathbf{W}_1, \mathbf{W}_2$ 分别为权重按列均分后各 GPU 持有的子矩阵。该公式表明：将权重按列切分后，各 GPU 可独立计算局部输出 $\mathbf{X}\mathbf{W}_i$，最终将结果按列拼接即可还原完整输出 $\mathbf{Y}$，前向过程无需跨卡通信。
+
 ```python
 class ColumnParallelLinear(nn.Module):
     def __init__(self, input_size, output_size, world_size, rank):
@@ -65,6 +67,8 @@ class ColumnParallelLinear(nn.Module):
 将权重按行切分，输入需要按列切分，输出进行AllReduce聚合：
 
 $$\mathbf{Y} = \mathbf{X}\mathbf{W} = [\mathbf{X}_1, \mathbf{X}_2]\begin{bmatrix}\mathbf{W}_1 \\ \mathbf{W}_2\end{bmatrix} = \mathbf{X}_1\mathbf{W}_1 + \mathbf{X}_2\mathbf{W}_2$$
+
+其中 $\mathbf{X}_i$ 为输入按列切分后第 $i$ 个 GPU 持有的子矩阵，$\mathbf{W}_i$ 为权重按行切分后对应的子矩阵。各 GPU 先在本地计算部分积 $\mathbf{X}_i\mathbf{W}_i$，再通过 AllReduce 对所有部分积求和得到最终输出 $\mathbf{Y}$。行并行与列并行配合使用，可使 MLP 或 Attention 层在每个 Transformer 块内仅需两次 AllReduce 通信。
 
 ```python
 class RowParallelLinear(nn.Module):
@@ -195,6 +199,8 @@ python pretrain_gpt.py \
 ### 数据并行
 
 总GPU数 = 张量并行 × 流水线并行 × 数据并行
+
+即 $N_{\text{GPU}} = N_{\text{TP}} \times N_{\text{PP}} \times N_{\text{DP}}$，其中 $N_{\text{TP}}$ 为张量并行度（层内切分），$N_{\text{PP}}$ 为流水线并行度（层间切分），$N_{\text{DP}}$ 为数据并行度（数据切分）。三者正交组合，覆盖所有 GPU；给定总卡数和其中两种并行度，可推算第三种：$N_{\text{DP}} = N_{\text{GPU}} / (N_{\text{TP}} \times N_{\text{PP}})$。
 
 ```bash
 # 64个GPU，TP=8，PP=4

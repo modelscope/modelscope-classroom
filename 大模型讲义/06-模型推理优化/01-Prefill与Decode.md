@@ -38,7 +38,13 @@ graph LR
 
 $$\sum_{t=n}^{n+m-1} O(t^2 \cdot d) = O((n+m)^2 \cdot m \cdot d)$$
 
-假设你正在写一篇 1000 字的作文，如果每写一个字都要重读前面所有内容，写到第 500 字时每个字的「思考成本」已经是第 10 字时的 2500 倍。对于长 prompt 或长输出，这个开销显然难以接受。
+其中：
+- $n$ 表示输入 prompt 的长度（token 数）
+- $m$ 表示待生成的输出 token 数
+- $d$ 表示模型隐藏层维度
+- $t$ 表示当前已有的序列长度，从 $n$ 增长到 $n+m-1$
+
+说白了，每生成一个新 token 都要对已有的全部 $t$ 个 token 做一次 $O(t^2 \cdot d)$ 的注意力计算，而 $t$ 随生成过程持续增长，后续 token 的成本急剧攀升。想象你写一篇 1000 字的作文，每写一个字都要重读前面全部内容——写到第 500 字时，每个字的思考成本已是第 10 字时的 2500 倍。对于长 prompt 或长输出，这个开销显然不可接受。
 
 ## 6.1.2 Prefill 阶段
 
@@ -54,11 +60,11 @@ $$\sum_{t=n}^{n+m-1} O(t^2 \cdot d) = O((n+m)^2 \cdot m \cdot d)$$
 
 ### 计算特点
 
-**并行性好**：所有 token 可以同时计算，类似训练的前向传播。回到餐厅的场景——服务员看一整张菜单时，所有菜名是同时映入眼帘的，不需要一个字一个字地看。
+**并行性好**：所有 token 可同时计算，类似训练的前向传播。回到餐厅场景——服务员看菜单时，所有菜名同时映入眼帘，无需逐字阅读。
 
-**计算密集**：主要瓶颈是矩阵乘法（计算 Q、K、V 和注意力），GPU 利用率高。
+**计算密集**：瓶颈在矩阵乘法（Q、K、V 投影与注意力计算），GPU 利用率高。
 
-**一次性开销**：每个请求只需一次 Prefill。就像考试时读完题目——读题只需要一次，之后的时间全部用来作答。
+**一次性开销**：每个请求只做一次 Prefill，如同考试时的审题——审题只需一次，之后全力作答。
 
 ### 计算量分析
 
@@ -68,19 +74,32 @@ Prefill 的主要计算：
 
 $$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}$$
 
-- $\mathbf{Q}, \mathbf{K}, \mathbf{V}$ 的计算：$O(n \cdot d^2)$
-- $\mathbf{Q}\mathbf{K}^\top$：$O(n^2 \cdot d)$
-- $\text{softmax} \cdot \mathbf{V}$：$O(n^2 \cdot d)$
+其中：
+- $\mathbf{Q}, \mathbf{K}, \mathbf{V} \in \mathbb{R}^{n \times d}$ 分别为查询、键、值矩阵，由输入通过线性变换得到
+- $d_k$ 为每个注意力头的维度，缩放因子 $\sqrt{d_k}$ 防止点积过大导致 softmax 饱和
+- $n$ 为序列长度，$d$ 为隐藏层维度
+
+各步骤的计算量：
+- $\mathbf{Q}, \mathbf{K}, \mathbf{V}$ 的线性投影：$O(n \cdot d^2)$（$n$ 个 token 各做一次 $d \to d$ 的矩阵乘法）
+- $\mathbf{Q}\mathbf{K}^\top$：$O(n^2 \cdot d)$（$n \times n$ 个点积，每个涉及 $d$ 维向量）
+- $\text{softmax} \cdot \mathbf{V}$：$O(n^2 \cdot d)$（加权求和）
 
 **FFN 计算**：
 
 $$\text{FFN}(\mathbf{x}) = \text{GELU}(\mathbf{x}\mathbf{W}_1)\mathbf{W}_2$$
 
-- $O(n \cdot d \cdot d_{ff})$，其中 $d_{ff}$ 通常是 $4d$
+其中：
+- $\mathbf{x} \in \mathbb{R}^{n \times d}$ 为输入
+- $\mathbf{W}_1 \in \mathbb{R}^{d \times d_{ff}}$、$\mathbf{W}_2 \in \mathbb{R}^{d_{ff} \times d}$ 为 FFN 的两层权重
+- $d_{ff}$ 为 FFN 中间维度，通常取 $4d$
 
-总计算量：$O(L \cdot (n^2 \cdot d + n \cdot d^2))$
+FFN 每层计算量为 $O(n \cdot d \cdot d_{ff})$。
 
-对于长 prompt（$n$ 大），注意力的 $O(n^2)$ 成为瓶颈。
+综合以上，Prefill 阶段**每层**总计算量：
+
+$$O(L \cdot (n^2 \cdot d + n \cdot d^2))$$
+
+其中 $L$ 为 Transformer 层数。当 prompt 较短时，$n \cdot d^2$（线性投影）主导计算量；当 $n > d$ 时，$n^2 \cdot d$（注意力计算）成为瓶颈——这正是长 prompt 处理速度下降的根本原因。
 
 ### TTFT 优化
 
@@ -117,12 +136,15 @@ $$\text{FFN}(\mathbf{x}) = \text{GELU}(\mathbf{x}\mathbf{W}_1)\mathbf{W}_2$$
 
 设模型参数量为 $P$，每步 Decode：
 
-- 计算量：$O(d^2 \cdot L)$（一个 token 的矩阵乘法）
-- 数据传输量：$O(P)$（加载全部参数）
+- 计算量：$O(d^2 \cdot L)$（一个 token 经过 $L$ 层，每层主要做 $d \times d$ 的矩阵乘法）
+- 数据传输量：$O(P)$（需要从显存加载全部模型参数）
 
-对于大模型，$P$ 很大，算术强度低，GPU 大部分时间在等待数据。这就是 Decode 阶段**内存带宽受限**（Memory-bound）的根本原因。
+其中：
+- $d$ 表示隐藏层维度
+- $L$ 表示 Transformer 层数
+- $P$ 表示模型总参数量（约 $12 \cdot L \cdot d^2$ 量级）
 
-换个角度看：GPU 就像一位算力惊人的数学天才，但每次做题前都要等快递把「参数教材」送到手边。教材有 140GB 那么厚，快递通道（内存带宽）再宽也需要时间。结果这位天才大部分时间不是在计算，而是在等快递——这就是 Memory-bound 的本质。
+算术强度 = $O(d^2 \cdot L) / O(P) \approx O(1)$，远低于 GPU 的算术强度阈值，GPU 大部分时间在等数据从显存搬到计算单元——这就是 Decode 阶段**内存带宽受限**（Memory-bound）的本质。打个比方：GPU 像一位算力惊人的数学天才，但每次做题前都要等快递把 140GB 的「参数教材」送到手边，带宽通道再宽也需要时间，结果天才大部分时间不是在计算而是在等快递。
 
 ### 量化示例
 
@@ -167,34 +189,34 @@ graph TD
 
 这种差异对系统设计有深刻影响：
 
-**分离调度**：Prefill 和 Decode 可以分开调度，甚至用不同的硬件。好比一家物流公司把「分拣中心」和「末端配送」设在不同的地方，各自用最适合的团队和设备。
+**分离调度**：Prefill 与 Decode 可分开调度甚至部署到不同硬件，如同物流公司将分拣中心与末端配送设在不同地点，各取所长。
 
-**批处理策略**：Prefill 受益于大批量，Decode 需要其他优化（如 Continuous Batching）。
+**批处理策略**：Prefill 受益于大批量；Decode 则依赖 Continuous Batching 等专用优化。
 
-**资源分配**：Prefill 需要更多计算资源，Decode 需要更多内存带宽。
+**资源分配**：Prefill 需要算力，Decode 需要带宽，二者的资源画像截然不同。
 
 ## 6.1.5 Chunked Prefill
 
 ### 长 Prompt 的问题
 
-当 prompt 很长（如 100K token）时，Prefill 的 $O(n^2)$ 注意力计算和显存占用成为问题。假设你正在处理一本完整的小说作为输入——10 万个 token 意味着注意力矩阵达到 $10^{10}$ 量级的元素数，光存储这张「关系表」就可能撑爆显存。
+当 prompt 很长（如 100K token）时，Prefill 的 $O(n^2)$ 注意力计算和显存占用成为瓶颈——10 万个 token 意味着注意力矩阵达 $10^{10}$ 量级元素，光存储这张关系表就可能撑爆显存。具体表现为：
 
-具体来说：
-
-1. **显存溢出**：注意力矩阵 $n \times n$ 可能超出显存
-2. **延迟尖峰**：长 Prefill 阻塞其他请求——就像高速公路入口处一辆超长货车挡住了后面所有小轿车
-3. **批处理困难**：不同长度的 prompt 难以高效批处理
+1. **显存溢出**：$n \times n$ 的注意力矩阵可能超出显存容量
+2. **延迟尖峰**：长 Prefill 阻塞其他请求，如同高速入口处的超长货车挡住后面所有车辆
+3. **批处理困难**：不同长度的 prompt 难以高效组批
 
 ### Chunked Prefill
 
-**Chunked Prefill** 将长 prompt 分块处理——这就像把一本厚书分成若干章节，一章一章地消化，而不是试图一口气读完：
+**Chunked Prefill** 将长 prompt 分块处理，如同把厚书分成章节逐章消化，而非一口气读完：
 
 1. 将 prompt 分成大小为 $C$ 的 chunk
 2. 逐 chunk 进行 Prefill，累积 KV Cache
 3. 最后一个 chunk 后进入 Decode
 
+其中 $C$ 为分块大小（chunk size），通常取几千（如 $C = 2048$），远小于完整 prompt 长度 $n$。
+
 优势：
-- 显存占用可控（$O(C^2)$ 而非 $O(n^2)$）
+- 显存占用可控——注意力矩阵从 $O(n^2)$ 降为 $O(C^2)$，峰值显存由 chunk 大小而非总 prompt 长度决定
 - 长 prompt 不会阻塞其他请求
 - 可以与 Decode 请求混合调度
 
@@ -251,4 +273,4 @@ graph LR
 2. KV Cache 通过高速网络（如 NVLink、InfiniBand）传递
 3. Decode 节点专门生成输出
 
-这种架构在大规模部署中可以显著提高资源利用率，但增加了系统复杂度。
+该架构在大规模部署中可显著提高资源利用率，代价是系统复杂度的上升。

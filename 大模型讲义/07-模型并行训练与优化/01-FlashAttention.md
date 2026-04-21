@@ -14,13 +14,17 @@ $$\mathbf{S} = \mathbf{Q}\mathbf{K}^\top / \sqrt{d_k}$$
 $$\mathbf{P} = \text{softmax}(\mathbf{S})$$
 $$\mathbf{O} = \mathbf{P}\mathbf{V}$$
 
-其中 $\mathbf{Q}, \mathbf{K}, \mathbf{V} \in \mathbb{R}^{N \times d}$，$N$ 是序列长度。
+其中：
+- $\mathbf{Q}, \mathbf{K}, \mathbf{V} \in \mathbb{R}^{N \times d}$，$N$ 为序列长度，$d$ 为每个注意力头的维度
+- $\mathbf{S} \in \mathbb{R}^{N \times N}$ 为注意力分数矩阵
+- $\mathbf{P} \in \mathbb{R}^{N \times N}$ 为 softmax 归一化后的注意力权重
+- $\mathbf{O} \in \mathbb{R}^{N \times d}$ 为最终输出
 
 ### 显存问题
 
 中间结果 $\mathbf{S}, \mathbf{P} \in \mathbb{R}^{N \times N}$，显存占用 $O(N^2)$。
 
-对于 $N = 8192$，$\mathbf{S}$ 和 $\mathbf{P}$ 各占 256MB（FP32）或 128MB（FP16）。在多层、多头的情况下，这个开销非常可观。
+对于 $N = 8192$，$\mathbf{S}$ 和 $\mathbf{P}$ 各占 $8192^2 \times 4 \approx 256$ MB（FP32）或 $128$ MB（FP16）。在多层、多头的情况下（例如 32 层 $\times$ 32 头），总额外显存达到数百 GB——这正是标准注意力的核心瓶颈。
 
 ### 内存带宽瓶颈
 
@@ -28,9 +32,11 @@ GPU 的计算能力远超内存带宽。以 A100 为例：
 
 - 计算能力：312 TFLOPS（FP16 Tensor Core）
 - 显存带宽：2 TB/s
-- 算术强度阈值：312 / 2 = 156 FLOPS/byte
+- 算术强度阈值：$312 \text{ TFLOPS} / 2 \text{ TB/s} = 156$ FLOPS/byte
 
-标准注意力的算术强度远低于这个阈值——大量时间花在读写中间结果 $\mathbf{S}$、$\mathbf{P}$ 上，而非实际计算。这就像一位算力惊人的数学家，大部分时间不是在计算，而是在翻找草稿纸和抄写中间结果。
+其中算术强度阈值表示：当一个算子的“每字节计算次数”低于该值时，它就是内存带宽受限的；GPU 花在“搬运数据”上的时间多于“计算”。
+
+标准注意力的算术强度远低于该阈值——大量时间花在读写中间结果 $\mathbf{S}$、$\mathbf{P}$ 上，而非实际计算。就像一位算力惊人的数学家，大部分时间不是在计算，而是在翻找和抄写草稿纸。
 
 ## 7.1.2 Flash Attention 原理
 
@@ -110,13 +116,20 @@ for j in range(0, N, B_c):  # Key/Value 块
 
 **显存**：
 
-- 标准注意力：$O(N^2)$（存储 $\mathbf{S}$ 和 $\mathbf{P}$）
-- Flash Attention：$O(N)$（只存储 $\mathbf{O}$、$m$、$l$）
+- 标准注意力：$O(N^2)$（存储 $\mathbf{S}$ 和 $\mathbf{P}$，每个均为 $N \times N$ 矩阵）
+- Flash Attention：$O(N)$（只存储输出 $\mathbf{O} \in \mathbb{R}^{N \times d}$ 以及每行的统计量 $m, l \in \mathbb{R}^{N}$）
+
+拆开来看：标准注意力需要存储完整的 $N \times N$ 中间矩阵，而 Flash Attention 通过分块计算和在线 Softmax，将显存从平方级降到线性级——这是支撑长序列训练的关键。
 
 **HBM 访问**：
 
 - 标准注意力：$O(N^2 d + N^2)$（读写 $\mathbf{Q}, \mathbf{K}, \mathbf{V}, \mathbf{S}, \mathbf{P}, \mathbf{O}$）
-- Flash Attention：$O(N^2 d^2 / M)$，其中 $M$ 是 SRAM 大小
+- Flash Attention：$O(N^2 d^2 / M)$
+
+其中：
+- $M$ 为 GPU SRAM（高速缓存）大小（A100 为 192 KB / SM）
+- 分母中的 $M$ 反映了“桌面越大，走向书架的次数越少”这一直觉
+- 当 $M = \Theta(Nd)$ 时，HBM 访问量为 $O(Nd)$，变为线性，达到理论下界
 
 当 $M$ 足够大时，Flash Attention 的 HBM 访问量显著减少。
 
@@ -156,7 +169,7 @@ graph LR
 
 Flash Attention 的反向传播也需要特殊处理。由于不存储 $\mathbf{S}$ 和 $\mathbf{P}$，需要在反向时重新计算（recomputation）。
 
-这看似“丢了草稿纸还得重新算一遍”，但实际上所节省的显存使得可以使用更大的批次或更长的序列，总体上是划算的——用「计算时间」换「桌面空间」，而桌面空间正是瓶颈。
+这看似「丢了草稿纸还得重新算」，但省下的显存使得可以使用更大批次或更长序列，总体上是划算的——用计算时间换显存空间，而显存正是瓶颈所在。
 
 ## 7.1.4 因果掩码与变长序列
 

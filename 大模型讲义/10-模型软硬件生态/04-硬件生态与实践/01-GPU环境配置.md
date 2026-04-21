@@ -45,6 +45,8 @@ print(estimate_memory(7))
 # {'inference': 14.0, 'training': 126.0}
 ```
 
+上述估算函数中，`model_params_b` 为模型参数量（单位：十亿 / Billion），`precision` 为精度类型。推理显存的计算为 $\text{model\_memory} = \text{params} \times \text{bytes\_per\_param}$，例如 7B 模型在 FP16 下为 $7 \times 2 = 14$ GB。训练显存还需额外包含梯度（与权重等大）及优化器状态（Adam 需保存一阶/二阶矩，各占 4 字节），因此混合精度训练每个参数约需 18 字节，即 7B 模型约需 $7 \times 18 = 126$ GB。
+
 ## 驱动与CUDA安装
 
 GPU环境的软件依赖栈从底层到上层如下：
