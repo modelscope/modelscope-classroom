@@ -65,7 +65,7 @@ rocm-smi
 
 ### 安装PyTorch
 
-这里有一个让很多人意外的设计决策：ROCm版本的PyTorch完全复用了CUDA的接口。也就是说，你的代码中仍然写`torch.cuda.is_available()`，它会返回True并识别出AMD GPU。这种设计的好处是现有代码基本不用改，但调试时偏尔会因为"明明是AMD卡但代码写着cuda"而困惑。
+这里有一个让很多人意外的设计决策：ROCm版本的PyTorch完全复用了CUDA的接口。也就是说，你的代码中仍然写`torch.cuda.is_available()`，它会返回True并识别出AMD GPU。这种设计的好处是现有代码基本不用改，但调试时偶尔会因为"明明是AMD卡但代码写着cuda"而困惑。
 
 ```bash
 # 从PyTorch官方安装
@@ -260,7 +260,7 @@ export HSA_OVERRIDE_GFX_VERSION=10.3.0  # 针对特定GPU
 
 ### 性能调优
 
-MIOpen需要在首次运行时对算子进行自动调优（auto-tuning），这会导致第一次训练明显较慢。的策略是将调优结果缓存起来：
+MIOpen需要在首次运行时对算子进行自动调优（auto-tuning），这会导致第一次训练明显较慢。推荐的策略是将调优结果缓存起来：
 
 ```bash
 # 环境变量

@@ -71,9 +71,13 @@ AlphaFold 2 的输入包含两部分：
 
 $$\mathbf{m}_{si} \leftarrow \text{RowAttention}(\mathbf{m}_{s:}, \mathbf{z})$$
 
+其中 $\mathbf{m}_{si}$ 为第 $s$ 条序列中第 $i$ 个残基的 MSA 表示，$\mathbf{m}_{s:}$ 表示该序列的整行特征，$\mathbf{z}$ 为配对表示矩阵。行注意力以配对表示作为偏置，在同一序列内部建立残基间的上下文关联。
+
 **MSA 列注意力**：跨序列的注意力，学习进化模式
 
 $$\mathbf{m}_{si} \leftarrow \text{ColAttention}(\mathbf{m}_{:i})$$
+
+其中 $\mathbf{m}_{:i}$ 表示所有序列在位置 $i$ 上的特征列向量。列注意力跨不同同源序列聚合信息，捕获进化过程中位置 $i$ 的共变模式。
 
 举个例子：行注意力好比你阅读一份折纸说明书时，注意到第 3 步和第 7 步之间存在关联；列注意力好比你翻看多份说明书后发现，不同版本在第 5 步都出现了类似的折法——这暗示第 5 步是一个结构上的关键节点。
 
@@ -81,6 +85,8 @@ $$\mathbf{m}_{si} \leftarrow \text{ColAttention}(\mathbf{m}_{:i})$$
 
 $$\mathbf{z}_{ij} \leftarrow \text{TriangleAttention}(\mathbf{z})$$
 $$\mathbf{z}_{ij} \leftarrow \text{TriangleMultiplication}(\mathbf{z})$$
+
+其中 $\mathbf{z}_{ij}$ 为配对表示矩阵中残基 $i$ 与残基 $j$ 之间的关系编码，$\mathbf{z}$ 为完整的 $L \times L$ 配对表示。三角形注意力沿行或列对 $\mathbf{z}$ 做注意力更新，三角形乘法则通过中间残基 $k$ 以乘法方式融合 $\mathbf{z}_{ik}$ 和 $\mathbf{z}_{kj}$ 来更新 $\mathbf{z}_{ij}$。
 
 **三角形约束**的动机：如果残基 $i$ 接近 $j$，$j$ 接近 $k$，则 $i$ 应该接近 $k$（三角不等式）。假设你正在确定地图上三个城市的位置——已知北京到上海 1000 公里，上海到杭州 200 公里，那么北京到杭州不可能是 5000 公里。三角形注意力将这种朴素的几何直觉注入到了网络结构中。
 
@@ -101,6 +107,8 @@ AlphaFold 使用多种损失的组合：
 **FAPE**（Frame Aligned Point Error）：对齐后的坐标误差
 
 $$L_{\text{FAPE}} = \frac{1}{N^2} \sum_{i,j} \| T_i^{-1} \mathbf{x}_j - T_i^{-1} \hat{\mathbf{x}}_j \|$$
+
+其中 $N$ 为残基总数，$T_i \in SE(3)$ 为残基 $i$ 的局部坐标系（刚体变换），$\mathbf{x}_j$ 和 $\hat{\mathbf{x}}_j$ 分别为残基 $j$ 的预测坐标和真实坐标，$T_i^{-1}$ 将全局坐标变换到残基 $i$ 的局部参考系下。FAPE 的核心思想是：在每个残基的局部坐标系中分别度量其他残基的位置误差，然后取平均。这种设计使得损失对全局平移和旋转不敏感，同时能够捕获局部结构的精度。
 
 **辅助损失**：MSA 掩码预测、配对距离预测等
 

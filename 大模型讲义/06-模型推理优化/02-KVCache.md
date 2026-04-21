@@ -112,7 +112,13 @@ attn_output = attention(q, K_full, V_full)  # [B, 1, d]
 | Decode（每个 token） | $O(t^2 \cdot d)$ | $O(t \cdot d)$ |
 | Decode（$m$ tokens 总计） | $O(m \cdot n^2 \cdot d)$ | $O(m \cdot n \cdot d)$ |
 
-KV Cache 将 Decode 的复杂度从二次降为线性。换句话说，没有 KV Cache 时，生成第 1000 个 token 的成本是第 10 个 token 的一万倍；有了 KV Cache，只是 100 倍——这就是「查点单本」与「重新问一遍」的差距。
+其中：
+- $n$ 为 prompt 长度，$m$ 为生成长度，$d$ 为隐藏层维度
+- $t$ 为 Decode 时当前序列长度（逐步增长）
+- 无 KV Cache 时，生成每个 token 需要重新计算完整 $t \times t$ 注意力矩阵（$O(t^2 \cdot d)$）
+- 有 KV Cache 时，只需计算新 token 与缓存的 $t$ 个 K/V 的点积（$O(t \cdot d)$）
+
+这个公式告诉我们：KV Cache 将 Decode 的复杂度从二次降为线性。没有 KV Cache 时，生成第 1000 个 token 的成本是第 10 个 token 的一万倍；有了 KV Cache 只是 100 倍——这就是「查点单本」与「重新问一遍」的差距。
 
 ## 6.2.3 显存占用分析
 
@@ -120,9 +126,21 @@ KV Cache 将 Decode 的复杂度从二次降为线性。换句话说，没有 KV
 
 设模型有 $L$ 层，隐藏维度 $d$，序列长度 $n$，批大小 $B$。
 
-每层 KV Cache：$2 \times n \times d$ 个元素（K 和 V）
+每层 KV Cache：$2 \times n \times d$ 个元素（K 和 V 各一份）
 
-总 KV Cache：$2 \times L \times B \times n \times d$ 个元素
+总 KV Cache：
+
+$$\text{KV Cache} = 2 \times L \times B \times n \times d \times \text{sizeof(dtype)}$$
+
+其中：
+- $L$ 为 Transformer 层数
+- $B$ 为批大小（并发请求数）
+- $n$ 为序列长度（token 数）
+- $d$ 为隐藏层维度
+- $\text{sizeof(dtype)}$ 为每个元素的字节数（FP16 为 2，FP32 为 4）
+- 因子 2 表示 K 和 V 各占一份
+
+换句话说，KV Cache 的显存占用与序列长度线性增长——每生成一个新 token 就多存一组 K 和 V 向量，序列足够长时，缓存本身的显存占用可能超过模型参数。
 
 以 LLaMA-70B 为例（$L=80$，$d=8192$，$n=4096$，$B=1$，FP16）：
 
@@ -130,7 +148,7 @@ $$2 \times 80 \times 1 \times 4096 \times 8192 \times 2 \text{ bytes} = 10.7 \te
 
 **单个请求的 KV Cache 就占用 10.7GB**！这是 LLM 推理显存紧张的主要原因。
 
-举个直观的比较：一张普通照片大约 5MB，而一个用户请求的 KV Cache 相当于同时存储约 2000 张照片。每来一个用户就要占用这么多显存，难怪 GPU 显存永远不够用。
+作为参照，一张普通照片约 5MB，10.7GB 的 KV Cache 相当于约 2000 张照片。每来一个用户就占据这么多显存，GPU 显存永远紧张也就不足为奇了。
 
 ### 与模型参数的对比
 
@@ -138,17 +156,23 @@ LLaMA-70B 参数量：140GB（FP16）
 
 KV Cache（4K 上下文）：10.7GB / 请求
 
-批大小 8 时，KV Cache 总计：85.6GB，已接近模型参数量。也就是说，服务 8 个并发用户时，「点单本」占用的空间几乎和「菜谱」（模型参数）本身一样大了。
+批大小 8 时，KV Cache 总计 85.6GB，已接近模型参数量——服务 8 个并发用户时，「点单本」占用的空间几乎和「菜谱」本身一样大。
 
 ### GQA 对 KV Cache 的影响
 
-**GQA**（Grouped Query Attention）让多个 Query 头共享一组 KV 头，减少 KV Cache 大小。假设你正在组织一场会议，原来 64 个参会者每人各自做笔记（MHA），现在改为 8 个小组各共享一份笔记（GQA）——笔记本的总量直接缩减为原来的 1/8。
+**GQA**（Grouped Query Attention）让多个 Query 头共享一组 KV 头，从而缩小 KV Cache。打个比方，原来 64 个参会者每人各做笔记（MHA），现在 8 个小组各共享一份笔记（GQA），笔记本总量缩减为原来的 1/8。
 
 设 Query 头数为 $H_Q$，KV 头数为 $H_{KV}$：
 
-$$\text{KV Cache} = 2 \times L \times B \times n \times H_{KV} \times d_k$$
+$$\text{KV Cache} = 2 \times L \times B \times n \times H_{KV} \times d_k \times \text{sizeof(dtype)}$$
 
-LLaMA-2 70B 使用 GQA（$H_Q=64$，$H_{KV}=8$），KV Cache 缩小为 MHA 的 $1/8$。
+其中：
+- $H_Q$ 为 Query 注意力头数
+- $H_{KV}$ 为 KV 注意力头数，GQA 中 $H_{KV} < H_Q$
+- $d_k = d / H_Q$ 为每个注意力头的维度
+- 总隐藏维度 $d = H_Q \times d_k$
+
+GQA 的缩减比为 $H_{KV} / H_Q$。LLaMA-2 70B 使用 GQA（$H_Q=64$，$H_{KV}=8$），KV Cache 缩小为 MHA 的 $8/64 = 1/8$。
 
 ## 6.2.4 KV Cache 优化技术
 
@@ -172,6 +196,8 @@ LLaMA-2 70B 使用 GQA（$H_Q=64$，$H_{KV}=8$），KV Cache 缩小为 MHA 的 $
 **滑动窗口注意力**：只保留最近 $W$ 个位置的 KV Cache。
 
 $$\mathbf{K}_{\text{cache}} = \mathbf{K}_{t-W+1:t}$$
+
+其中 $W$ 为窗口大小（token 数），$t$ 为当前位置。只保留最近 $W$ 个位置的 K/V，显存占用从 $O(n)$ 降为 $O(W)$，与序列总长无关。
 
 这就像手机聊天记录的「只显示最近 N 条」功能——不再保存所有历史消息，只留最近的对话上下文。Mistral 等模型原生支持滑动窗口，适合长序列场景。
 
@@ -206,7 +232,7 @@ graph TD
 
 标准 **MHA**（Multi-Head Attention）每个头有独立的 $\mathbf{W}_K, \mathbf{W}_V$，产生独立的 KV Cache。
 
-但研究发现，不同头的 KV 有很高的相似性，存在冗余。
+但研究表明，不同头的 KV 具有较高相似性，存在显著冗余。
 
 ### MQA
 
@@ -260,7 +286,7 @@ GQA 在质量和效率之间取得了很好的平衡，被 LLaMA-2、Mistral 等
         ^空隙^        ^空隙^
 ```
 
-短请求结束释放后，留下的空隙可能无法容纳新的长请求。这就像停车场里的小车走了之后，留下的空位太小，大巴士停不进去——内存明明有剩余，却用不上。
+短请求结束释放后，留下的空隙往往无法容纳新的长请求——就像停车场里小车离开后，留下的空位太小，大巴士停不进去；显存明明有剩余却无法使用。
 
 ### Paged Attention
 

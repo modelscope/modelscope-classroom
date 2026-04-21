@@ -1,6 +1,6 @@
 # 4.1 VAE：变分自编码器
 
-*变分自编码器**（Variational Autoencoder, VAE）是深度生成模型的重要里程碑。它结合了神经网络的表达能力和变分推断的理论框架，学习数据的低维隐表示。在现代视觉生成系统中，VAE 主要作为图像的编码器-解码器，将高维像素空间压缩到低维潜空间，扩散模型在此潜空间中进行生成。
+**变分自编码器**（Variational Autoencoder, VAE）结合神经网络的表达能力与变分推断的理论框架，学习数据的低维隐表示。在现代视觉生成系统中，VAE 主要充当编码器-解码器，将高维像素空间压缩至低维潜空间，扩散模型在此潜空间中完成生成。
 
 想象一下，你请一位经验丰富的素描画家为你画一幅肖像。画家不会把你每一根头发丝、每一颗毛孔都原封不动地复制到纸上——那是照相机干的事。画家做的是：仔细观察你的五官比例、神态气质，在脑海中提炼出最能代表你的那些"精髓特征"，然后凭借这些精髓在纸上重新创作。VAE 的工作方式与此高度类似：编码器像画家的眼睛，将一张高清照片"凝缩"为一组紧凑的隐变量（latent code）；解码器像画家的手，从这组隐变量出发，重建出原始图像。这个过程的关键在于：隐变量不能是任意乱码，它必须遵循一种"标准画风"——也就是先验分布——使得我们可以在这套画风的空间里自由采样，生成全新的、从未见过的面孔。
 
@@ -48,7 +48,15 @@ $$p(\mathbf{x}) = \int p(\mathbf{x} | \mathbf{z}) p(\mathbf{z}) d\mathbf{z}$$
 
 $$\log p(\mathbf{x}) \geq \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}[\log p_\theta(\mathbf{x} | \mathbf{z})] - D_{\text{KL}}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))$$
 
+其中：
+- $q_\phi(\mathbf{z}|\mathbf{x})$ 表示由参数 $\phi$ 的编码器网络定义的近似后验分布，将输入 $\mathbf{x}$ 映射到潜在变量 $\mathbf{z}$ 的分布
+- $p_\theta(\mathbf{x}|\mathbf{z})$ 表示由参数 $\theta$ 的解码器网络定义的似然函数，从潜在变量重建输入
+- $p(\mathbf{z})$ 表示潜在变量的先验分布，通常取标准正态分布 $\mathcal{N}(\mathbf{0}, \mathbf{I})$
+- $D_{\text{KL}}(\cdot \| \cdot)$ 表示 Kullback-Leibler 散度，衡量两个概率分布之间的非对称距离
+
 右边称为**证据下界**（Evidence Lower Bound, ELBO）或**变分下界**。
+
+换句话说，直接计算 $\log p(\mathbf{x})$ 需要对所有可能的 $\mathbf{z}$ 积分，高维空间中完全不可行。ELBO 提供了一个可计算的下界：最大化 ELBO 等价于同时提升数据似然并使近似后验逼近真实后验。等号成立当且仅当 $q_\phi(\mathbf{z}|\mathbf{x}) = p(\mathbf{z}|\mathbf{x})$，即近似后验恰好等于真实后验。
 
 ### ELBO 的分解
 
@@ -93,6 +101,14 @@ $$p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\th
 
 $$\mathbf{z} = \boldsymbol{\mu}_\phi(\mathbf{x}) + \boldsymbol{\sigma}_\phi(\mathbf{x}) \odot \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$
 
+其中：
+- $\boldsymbol{\mu}_\phi(\mathbf{x})$ 为编码器输出的均值向量，决定潜在分布的中心位置
+- $\boldsymbol{\sigma}_\phi(\mathbf{x})$ 为编码器输出的标准差向量，决定潜在分布的扩展范围
+- $\boldsymbol{\epsilon}$ 为从标准正态分布采样的随机噪声，与模型参数无关
+- $\odot$ 表示逐元素相乘（Hadamard 积）
+
+这个公式告诉我们：采样操作本身不可微分，梯度无法穿过随机节点反向传播。重参数化技巧将 $\mathbf{z}$ 表示为确定性函数加外部噪声的形式，使梯度绕过随机性，直接对 $\boldsymbol{\mu}$ 和 $\boldsymbol{\sigma}$ 求导——这正是 VAE 能用标准反向传播训练的关键所在。
+
 不妨设想你在射箭：$\boldsymbol{\mu}$ 是你瞄准的靶心位置，$\boldsymbol{\sigma}$ 是你手抖的幅度，$\boldsymbol{\epsilon}$ 是每次射箭时随机的风力扰动。重参数化技巧的关键在于：风力 $\boldsymbol{\epsilon}$ 是外部随机因素，与你的瞄准技术无关；而你可以通过练习来调整瞄准位置和稳定性（即优化 $\boldsymbol{\mu}$ 和 $\boldsymbol{\sigma}$）。这样一来，梯度就可以沿着"瞄准"和"稳定性"这两条路径反向传播，而不必穿过随机采样这堵不可微的墙。
 
 ### KL 散度的解析解
@@ -101,13 +117,27 @@ $$\mathbf{z} = \boldsymbol{\mu}_\phi(\mathbf{x}) + \boldsymbol{\sigma}_\phi(\mat
 
 $$D_{\text{KL}}(q_\phi \| p) = -\frac{1}{2} \sum_{j=1}^d \left(1 + \log \sigma_j^2 - \mu_j^2 - \sigma_j^2\right)$$
 
+其中：
+- $d$ 为潜在空间的维度
+- $\mu_j$ 为近似后验第 $j$ 维的均值
+- $\sigma_j^2$ 为近似后验第 $j$ 维的方差
+- 求和遍历潜在空间的每一维，各维独立贡献（因为假设对角协方差）
+
+拆开来看，该公式将高维分布间的 KL 散度分解为逐维度的独立惩罚之和。每一维的贡献 $-\frac{1}{2}(1 + \log\sigma_j^2 - \mu_j^2 - \sigma_j^2)$ 在 $\mu_j=0, \sigma_j=1$ 时恰好为零——KL 散度同时惩罚两种偏离：均值远离原点（分布中心偏移）和方差偏离 1（分布形状失真）。
+
 这个公式有直观的几何含义：$\mu_j^2$ 惩罚均值偏离原点（画家的"标准审美中心"），$\sigma_j^2 - \log \sigma_j^2 - 1$ 惩罚方差偏离 1（画风的"标准离散度"）。当 $\mu_j = 0, \sigma_j = 1$ 时，每一项都恰好为零，KL 散度归零——编码器完美匹配了标准正态先验。
 
 ### 完整损失函数
 
 $$\mathcal{L}_{\text{VAE}} = \mathbb{E}_{\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})}\left[\|\mathbf{x} - g_\theta(\boldsymbol{\mu}_\phi(\mathbf{x}) + \boldsymbol{\sigma}_\phi(\mathbf{x}) \odot \boldsymbol{\epsilon})\|^2\right] + \beta \cdot D_{\text{KL}}$$
 
-$\beta$ 是平衡重建和正则化的超参数（$\beta$-VAE）。
+其中：
+- $g_\theta$ 为解码器网络，参数为 $\theta$
+- $\|\cdot\|^2$ 为均方误差重建损失，衡量重建图像与原始图像的逐像素差异
+- $\beta$ 为平衡重建质量与正则化强度的超参数（$\beta$-VAE）
+- $D_{\text{KL}}$ 为上述 KL 散度解析解
+
+本质上，这个损失函数体现了一个核心权衡：第一项（重建损失）驱动模型精确复现输入图像，第二项（KL 正则）驱动潜在空间保持规整可采样的结构。$\beta$ 控制天平的倾斜方向——过大则潜在空间规整但图像模糊，过小则图像清晰但潜在空间混乱、难以生成新样本。
 
 举个例子，假设你同时追求两个目标：肖像画得像（重建项）和画风规范（KL 项）。$\beta$ 就像一个调节旋钮——拧大了，画风极其规范，但细节可能丢失；拧小了，细节丰富，但画风可能古怪到无法通用。实际训练中，找到合适的 $\beta$ 往往需要反复实验。
 
@@ -132,7 +162,7 @@ $$\mathbf{z}_q = \text{Quantize}(\mathbf{z}_e) = \arg\min_{\mathbf{e}_k \in \mat
 
 训练时使用 **Straight-Through Estimator**：前向用量化后的向量，反向梯度直接传给编码器输出。
 
-Q-VAE 的离散隐空间更适合与自回归模型结合，是 DALL-E（第一版）的核心组件。
+VQ-VAE 的离散隐空间更适合与自回归模型结合，是 DALL-E（第一版）的核心组件。
 
 这就像把画家的连续色彩感受量化成一本有限的色卡：与其记住"偏暖的淡橘色"这种模糊描述，不如直接指定"色卡第 237 号"。离散化让编码变得精确且易于组合，特别适合配合自回归语言模型来"逐词"生成图像。
 
@@ -191,9 +221,15 @@ VAE 训练中常见的问题是**后验坍缩**（Posterior Collapse）：KL 项
 
 VAE 可以从**信息瓶颈**（Information Bottleneck）角度理解：
 
-$$\max I(\mathbf{z}; \mathbf{x}) - \beta I(\mathbf{z}; \mathbf{x})$$
+$$\max_{\phi, \theta} \; I_\theta(\mathbf{x}; \mathbf{z}) \quad \text{s.t.} \quad I_\phi(\mathbf{z}; \mathbf{x}) \leq I_c$$
 
-隐变量 $\mathbf{z}$ 应该保留关于 $\mathbf{x}$ 的"必要"信息，同时压缩"冗余"信息。这与日常生活中的笔记哲学一脉相通：好的笔记应当记录课堂的核心要点，而非逐字抄写老师说的每句话。保留太多细节，笔记臃肿难用；压缩过度，则关键信息遗失。VAE 的信息瓶颈正是在这两个极端之间寻找最优平衡。
+等价地，通过拉格朗日松弛可以写为：
+
+$$\max_{\phi, \theta} \; \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}[\log p_\theta(\mathbf{x}|\mathbf{z})] - \beta \cdot D_{\text{KL}}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))$$
+
+其中 $I(\mathbf{x}; \mathbf{z})$ 表示输入与潜在变量之间的互信息，$I_c$ 为信息容量约束，$\beta$ 为对应的拉格朗日乘子。
+
+>��信息论角度看，隐变量 $\mathbf{z}$ 应当捕获关于 $\mathbf{x}$ 的"必要且充分"的信息，同时通过限制互信息丢弃冗余细节。$\beta$ 越大，瓶颈越紧，隐变量越抽象；$\beta$ 越小，保留的细节越多。好的课堂笔记应当记录核心要点，而非逐字抄写老师说的每句话——保留太多细节则臃肿难用，压缩过度则关键信息遗失。VAE 的信息瓶颈正是在这两个极端之间寻找最优平衡，这也是 ELBO 中重建项与 KL 项对立统一的信息论解释。
 
 ### 与 EM 算法的联系
 

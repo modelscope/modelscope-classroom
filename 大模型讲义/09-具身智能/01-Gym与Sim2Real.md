@@ -255,7 +255,7 @@ class RandomizedEnv(gym.Wrapper):
 
 $$\mathbf{a} = \pi(\mathbf{o}, \mathbf{z}), \quad \mathbf{z} = \phi(\mathbf{o}_{1:t}, \mathbf{a}_{1:t-1})$$
 
-其中 $\mathbf{z}$ 是从历史轨迹推断出的隐式环境参数。
+其中 $\pi$ 为策略网络，$\mathbf{o}$ 为当前观测，$\mathbf{a}$ 为输出动作，$\mathbf{z}$ 为从历史观测-动作序列 $(\mathbf{o}_{1:t}, \mathbf{a}_{1:t-1})$ 中由编码器 $\phi$ 推断出的隐式环境参数。$\mathbf{z}$ 编码了当前环境的动力学特征（如质量、摩擦等），使策略能够自适应不同的物理参数配置。
 
 ### 系统辨识与仿真校准
 
@@ -280,7 +280,7 @@ $$\mathbf{a} = \pi(\mathbf{o}, \mathbf{z}), \quad \mathbf{z} = \phi(\mathbf{o}_{
 
 $$\mathcal{L} = \sum_{t} \|\mathbf{s}_t^{\text{real}} - \mathbf{s}_t^{\text{sim}}(\theta)\|^2$$
 
-其中 $\theta$ 是待辨识的仿真参数。
+其中 $\mathbf{s}_t^{\text{real}}$ 为时刻 $t$ 的真实系统状态，$\mathbf{s}_t^{\text{sim}}(\theta)$ 为以参数 $\theta$ 运行的仿真系统在同一时刻的状态，$\theta$ 为待辨识的仿真参数（如质量、摩擦系数、阻尼等）。该损失函数通过最小化仿真轨迹与真实轨迹的差距，优化仿真器参数以缩小 Reality Gap。
 
 ### 迁移学习方法
 
@@ -289,6 +289,8 @@ $$\mathcal{L} = \sum_{t} \|\mathbf{s}_t^{\text{real}} - \mathbf{s}_t^{\text{sim}
 **渐进式网络（Progressive Networks）**：为真实域添加新的网络列，同时保持仿真知识：
 
 $$\mathbf{h}_i^{(k)} = \sigma\left(\mathbf{W}_i^{(k)} \mathbf{h}_{i-1}^{(k)} + \sum_{j<k} \mathbf{U}_i^{(j:k)} \mathbf{h}_{i-1}^{(j)}\right)$$
+
+其中 $k$ 为域索引（$k=1$ 为仿真域，$k>1$ 为真实域），$i$ 为层索引，$\mathbf{W}_i^{(k)}$ 为第 $k$ 域第 $i$ 层的权重，$\mathbf{U}_i^{(j:k)}$ 为从域 $j$ 向域 $k$ 的侧向连接权重。第 $k$ 域的每一层不仅接收本域前一层的输出，还通过侧向连接接收所有先前域的特征，从而在保留仿真域知识的同时适应真实域。
 
 **对抗域适应**：学习域不变的特征表示，使判别器无法区分仿真与真实特征。
 
