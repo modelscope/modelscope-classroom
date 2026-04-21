@@ -1,6 +1,8 @@
 # GPU环境配置与使用
 
-NVIDIA GPU是当前大模型训练与推理的主流硬件平台。本节介绍GPU环境的配置方法和最佳实践。
+NVIDIA GPU是当前大模型训练与推理的主流硬件平台。本节介绍 GPU环境的配置方法和最佳实践。
+
+对于刚接触大模型的开发者，环境配置往往是第一个“坎”——驱动版本、CUDA版本、PyTorch版本三者之间的兼容性问题能让人折腾大半天。本节的目标是帮你理清这些关系，少踩坑。
 
 ## 硬件选型
 
@@ -44,6 +46,17 @@ print(estimate_memory(7))
 ```
 
 ## 驱动与CUDA安装
+
+GPU环境的软件依赖栈从底层到上层如下：
+
+```mermaid
+graph TD
+    A[NVIDIA驱动] --> B[CUDA Toolkit]
+    B --> C[cuDNN]
+    C --> D[PyTorch]
+    D --> E[Transformers / 训练框架]
+    E --> F[应用代码]
+```
 
 ### 驱动安装
 
@@ -276,6 +289,8 @@ docker run --gpus '"device=0,1"' -it my-image
 
 ### CUDA版本不匹配
 
+这是最常见的问题，也是新手最容易踩的坑。关键要理解：PyTorch自带的CUDA runtime和系统安装的CUDA Toolkit是两回事。`torch.version.cuda`显示的是PyTorch编译时用的版本，只要驱动版本足够新就能向下兼容。真正需要关注的是`nvidia-smi`显示的驱动CUDA版本要大于等于PyTorch要求的版本：
+
 ```bash
 # 检查PyTorch CUDA版本
 python -c "import torch; print(torch.version.cuda)"
@@ -288,6 +303,8 @@ nvcc --version
 
 ### 显存不足
 
+这是第二常见的问题，解决思路是分层递进的——先试最简单的方法，不行再上更复杂的：
+
 ```python
 # 减小batch size
 # 使用梯度累积
@@ -298,6 +315,8 @@ nvcc --version
 
 ### 多卡通信失败
 
+多卡训练时的通信问题通常与NCCL配置有关。排查时先开启详细日志，看报错出在哪一步：
+
 ```bash
 # 检查NCCL
 NCCL_DEBUG=INFO python -c "import torch.distributed"
@@ -306,4 +325,4 @@ NCCL_DEBUG=INFO python -c "import torch.distributed"
 # 确保所有节点可以互相访问指定端口
 ```
 
-NVIDIA GPU生态的成熟度使其成为大模型开发的首选平台。熟练掌握环境配置与性能优化技巧，可以充分发挥硬件性能，提升开发效率。
+NVIDIA GPU生态的成熟度使其成为大模型开发的首选平台。熟练掌握环境配置与性能优化技巧，可以充分发挥硬件性能，提升开发效率。一个实用建议：如果你经常需要配环境，考虑用Docker或conda来管理不同的CUDA版本组合——这比在系统层面反复安装卸载安全得多。

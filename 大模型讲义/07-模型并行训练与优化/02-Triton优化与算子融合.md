@@ -2,6 +2,8 @@
 
 **Triton** 是 OpenAI 开发的 GPU 编程语言和编译器，它让开发者能够以接近 Python 的简洁语法编写高效的 GPU 算子。结合**算子融合**（Operator Fusion），Triton 成为大模型优化的利器。
 
+举个生活中的例子：你要做一道菜，需要切菜、炒菜、调味三个步骤。传统做法是每步都把食材从冰箱取出来、处理完再放回冰箱，下一步再取出来——明显荒谬。算子融合就是把这三步合并成一气呵成：食材取出来一次性切、炒、调味，中间不用反复进出冰箱（显存）。
+
 ## 7.2.1 GPU 编程的挑战
 
 ### CUDA 的复杂性
@@ -14,7 +16,7 @@
 - 寄存器分配
 - 指令级并行
 
-编写高效的 CUDA kernel 需要深厚的硬件知识，门槛很高。
+编写高效的 CUDA kernel 需要深厚的硬件知识，门槛很高。假设你想开一家餐厅，CUDA 就像要求你从种菜、养鸡开始全部自己干，而 Triton 则是给你提供了半成品食材——你只需要关注「怎么烧菜」，底层的「种菜养鸡」由编译器搞定。
 
 ### 框架算子的局限
 
@@ -83,17 +85,36 @@ add_kernel[grid](x, y, output, n_elements, BLOCK_SIZE=1024)
 
 ### 融合的收益
 
-**算子融合**（Operator Fusion）将多个连续算子合并为一个 kernel，收益：
+**算子融合**（Operator Fusion）将多个连续算子合并为一个 kernel，收益显著：
 
 1. **减少 kernel launch**：N 个 launch → 1 个 launch
-2. **减少显存访问**：中间结果保持在寄存器/共享内存
+2. **减少显存访问**：中间结果保持在寄存器/共享内存，不用「放回冰箱再取出」
 3. **提高算术强度**：计算/访存比提升
+
+```mermaid
+graph LR
+    subgraph 未融合
+        A1[读取x] --> A2["kernel1: x*scale"]
+        A2 --> A3[写回显存]
+        A3 --> A4[读取y]
+        A4 --> A5["kernel2: y+bias"]
+        A5 --> A6[写回显存]
+        A6 --> A7[读取y]
+        A7 --> A8["kernel3: gelu(y)"]
+        A8 --> A9[写回显存]
+    end
+    subgraph 融合后
+        B1[读取x] --> B2["单kernel: gelu(x*scale+bias)"]
+        B2 --> B3[写回显存]
+    end
+```
 
 ### 融合示例
 
 未融合：
 ```python
 # 3 次 kernel launch，2 次中间结果写回显存
+# 就像切完菜放回冰箱，再拿出来炒，炒完再放回去，再拿出来调味...
 y = x * scale  # kernel 1
 y = y + bias   # kernel 2
 y = gelu(y)    # kernel 3
@@ -165,7 +186,7 @@ def softmax_kernel(
     tl.store(output_ptr + row_start + col_offsets, softmax_row, mask=mask)
 ```
 
-一次 kernel 完成全部计算，中间结果不离开寄存器。
+一次 kernel 完成全部计算，中间结果不离开寄存器——食材从冰箱取出来之后，切、炒、调味一口气完成，直接装盘。
 
 ## 7.2.5 Triton 在大模型中的应用
 

@@ -5,6 +5,7 @@
 Here we have gathered the deep learning tutorials from the MoDao community! Developers who love AI can find the knowledge they want to learn here, and learn how to train, infer, deploy, build applications, and perform various other common operations!
 
 # 🌿 Update Log
+- ⭐️**2026.04.21** Add **Large Model Textbook** with a complete theory and practice curriculum covering 13 chapters including deep learning fundamentals, model training & inference, reinforcement learning, agent technologies, and more. Check [大模型讲义](./大模型讲义).
 - ⭐️**2025.09.16** Add **Ultra-Long Sequence Parallelism: Ulysses + Ring-Attention Technical Principles and Implementation**. Check [here](Blogs/Articles/Ulysses_Ring_Attention/report_en.md).
 - ⭐️**2025.09.16** Add **DeepResearch agent technical survey**. Check [here](Blogs/Articles/Deep-Research-Survey/report_en.md).
 - ⭐️**2025.09.16** Add **All2All model surveys**. Check [here](Blogs/Articles/All2All-Survey/report_en.md).
