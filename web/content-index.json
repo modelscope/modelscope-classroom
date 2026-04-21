@@ -1,0 +1,813 @@
+{
+  "chapters": [
+    {
+      "id": "01",
+      "title": "有监督学习和无监督学习",
+      "count": 6,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/01-有监督学习和无监督学习/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "有监督和无监督学习的概念",
+          "file": "大模型讲义/01-有监督学习和无监督学习/01-有监督和无监督学习的概念.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "数据集的概念和含义",
+          "file": "大模型讲义/01-有监督学习和无监督学习/02-数据集的概念和含义.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "机器学习深度学习强化学习",
+          "file": "大模型讲义/01-有监督学习和无监督学习/03-机器学习深度学习强化学习.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "回归分类与聚类",
+          "file": "大模型讲义/01-有监督学习和无监督学习/04-回归分类与聚类.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "分类问题细分",
+          "file": "大模型讲义/01-有监督学习和无监督学习/05-分类问题细分.md"
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "模型损失与拟合算法",
+      "count": 8,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/02-模型损失与拟合算法/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "深度学习领域的基本概念",
+          "file": "大模型讲义/02-模型损失与拟合算法/01-深度学习领域的基本概念.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "最小二乘法基础",
+          "file": "大模型讲义/02-模型损失与拟合算法/02-最小二乘法基础.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "过拟合与欠拟合",
+          "file": "大模型讲义/02-模型损失与拟合算法/03-过拟合与欠拟合.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "泛化性",
+          "file": "大模型讲义/02-模型损失与拟合算法/04-泛化性.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "损失函数与正则化",
+          "file": "大模型讲义/02-模型损失与拟合算法/05-损失函数与正则化.md"
+        },
+        {
+          "type": "file",
+          "id": "06",
+          "title": "梯度下降法与优化器",
+          "file": "大模型讲义/02-模型损失与拟合算法/06-梯度下降法与优化器.md"
+        },
+        {
+          "type": "file",
+          "id": "07",
+          "title": "蒙特卡洛采样",
+          "file": "大模型讲义/02-模型损失与拟合算法/07-蒙特卡洛采样.md"
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "深度学习模型",
+      "count": 15,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/03-深度学习模型/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "经典神经网络结构",
+          "file": "大模型讲义/03-深度学习模型/01-经典神经网络结构.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "多层感知机",
+          "file": "大模型讲义/03-深度学习模型/02-多层感知机.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "CLIP多模态对比学习",
+          "file": "大模型讲义/03-深度学习模型/03-CLIP多模态对比学习.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "Transformer架构",
+          "file": "大模型讲义/03-深度学习模型/04-Transformer架构.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "分词与词典向量化",
+          "file": "大模型讲义/03-深度学习模型/05-分词与词典向量化.md"
+        },
+        {
+          "type": "file",
+          "id": "06",
+          "title": "Embedding与权重共享",
+          "file": "大模型讲义/03-深度学习模型/06-Embedding与权重共享.md"
+        },
+        {
+          "type": "file",
+          "id": "07",
+          "title": "位置编码",
+          "file": "大模型讲义/03-深度学习模型/07-位置编码.md"
+        },
+        {
+          "type": "file",
+          "id": "08",
+          "title": "激活函数",
+          "file": "大模型讲义/03-深度学习模型/08-激活函数.md"
+        },
+        {
+          "type": "file",
+          "id": "09",
+          "title": "正则化与残差连接",
+          "file": "大模型讲义/03-深度学习模型/09-正则化与残差连接.md"
+        },
+        {
+          "type": "file",
+          "id": "10",
+          "title": "注意力机制",
+          "file": "大模型讲义/03-深度学习模型/10-注意力机制.md"
+        },
+        {
+          "type": "file",
+          "id": "11",
+          "title": "MoE稀疏网络",
+          "file": "大模型讲义/03-深度学习模型/11-MoE稀疏网络.md"
+        },
+        {
+          "type": "file",
+          "id": "12",
+          "title": "多模态与全模态模型",
+          "file": "大模型讲义/03-深度学习模型/12-多模态与全模态模型.md"
+        },
+        {
+          "type": "file",
+          "id": "13",
+          "title": "轻量训练技术",
+          "file": "大模型讲义/03-深度学习模型/13-轻量训练技术.md"
+        },
+        {
+          "type": "file",
+          "id": "14",
+          "title": "新技术前沿",
+          "file": "大模型讲义/03-深度学习模型/14-新技术前沿.md"
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "视觉生成模型",
+      "count": 7,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/04-视觉生成模型/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "VAE变分自编码器",
+          "file": "大模型讲义/04-视觉生成模型/01-VAE变分自编码器.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "GAN生成对抗网络",
+          "file": "大模型讲义/04-视觉生成模型/02-GAN生成对抗网络.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "去噪概率模型",
+          "file": "大模型讲义/04-视觉生成模型/03-去噪概率模型.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "扩散模型结构",
+          "file": "大模型讲义/04-视觉生成模型/04-扩散模型结构.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "常用技术",
+          "file": "大模型讲义/04-视觉生成模型/05-常用技术.md"
+        },
+        {
+          "type": "file",
+          "id": "06",
+          "title": "视频生成技术",
+          "file": "大模型讲义/04-视觉生成模型/06-视频生成技术.md"
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "title": "强化学习基础",
+      "count": 6,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/05-强化学习基础/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "策略梯度与价值函数",
+          "file": "大模型讲义/05-强化学习基础/01-策略梯度与价值函数.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "广义优势估计",
+          "file": "大模型讲义/05-强化学习基础/02-广义优势估计.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "value-based与policy-based算法",
+          "file": "大模型讲义/05-强化学习基础/03-value-based与policy-based算法.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "Off-policy优化",
+          "file": "大模型讲义/05-强化学习基础/04-Off-policy优化.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "On-policy优化",
+          "file": "大模型讲义/05-强化学习基础/05-On-policy优化.md"
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "title": "模型推理优化",
+      "count": 6,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/06-模型推理优化/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "Prefill与Decode",
+          "file": "大模型讲义/06-模型推理优化/01-Prefill与Decode.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "KVCache",
+          "file": "大模型讲义/06-模型推理优化/02-KVCache.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "解码策略",
+          "file": "大模型讲义/06-模型推理优化/03-解码策略.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "PagedAttention",
+          "file": "大模型讲义/06-模型推理优化/04-PagedAttention.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "ContinuousBatching",
+          "file": "大模型讲义/06-模型推理优化/05-ContinuousBatching.md"
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "title": "模型并行训练与优化",
+      "count": 9,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/07-模型并行训练与优化/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "FlashAttention",
+          "file": "大模型讲义/07-模型并行训练与优化/01-FlashAttention.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "Triton优化与算子融合",
+          "file": "大模型讲义/07-模型并行训练与优化/02-Triton优化与算子融合.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "数据并行",
+          "file": "大模型讲义/07-模型并行训练与优化/03-数据并行.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "张量并行",
+          "file": "大模型讲义/07-模型并行训练与优化/04-张量并行.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "流水线并行",
+          "file": "大模型讲义/07-模型并行训练与优化/05-流水线并行.md"
+        },
+        {
+          "type": "file",
+          "id": "06",
+          "title": "专家并行",
+          "file": "大模型讲义/07-模型并行训练与优化/06-专家并行.md"
+        },
+        {
+          "type": "file",
+          "id": "07",
+          "title": "序列并行与上下文并行",
+          "file": "大模型讲义/07-模型并行训练与优化/07-序列并行与上下文并行.md"
+        },
+        {
+          "type": "file",
+          "id": "08",
+          "title": "多维并行",
+          "file": "大模型讲义/07-模型并行训练与优化/08-多维并行.md"
+        }
+      ]
+    },
+    {
+      "id": "08",
+      "title": "AI-for-Science",
+      "count": 3,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/08-AI-for-Science/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "AlphaFold",
+          "file": "大模型讲义/08-AI-for-Science/01-AlphaFold.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "图神经网络",
+          "file": "大模型讲义/08-AI-for-Science/02-图神经网络.md"
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "title": "具身智能",
+      "count": 3,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/09-具身智能/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "Gym与Sim2Real",
+          "file": "大模型讲义/09-具身智能/01-Gym与Sim2Real.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "机器人控制",
+          "file": "大模型讲义/09-具身智能/02-机器人控制.md"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "title": "模型软硬件生态",
+      "count": 19,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/10-模型软硬件生态/00-引言.md"
+        },
+        {
+          "type": "group",
+          "id": "01",
+          "title": "基础生态",
+          "children": [
+            {
+              "type": "file",
+              "id": "01",
+              "title": "PyTorch与NumPy基础",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/01-PyTorch与NumPy基础.md"
+            },
+            {
+              "type": "file",
+              "id": "02",
+              "title": "Transformers生态",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/02-Transformers生态.md"
+            },
+            {
+              "type": "file",
+              "id": "03",
+              "title": "Megatron",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/03-Megatron.md"
+            },
+            {
+              "type": "file",
+              "id": "04",
+              "title": "训练框架",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/04-训练框架.md"
+            },
+            {
+              "type": "file",
+              "id": "05",
+              "title": "LeRobot",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/05-LeRobot.md"
+            },
+            {
+              "type": "file",
+              "id": "06",
+              "title": "veRL",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/06-veRL.md"
+            },
+            {
+              "type": "file",
+              "id": "07",
+              "title": "Diff-Synth",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/07-Diff-Synth.md"
+            },
+            {
+              "type": "file",
+              "id": "08",
+              "title": "推理引擎",
+              "file": "大模型讲义/10-模型软硬件生态/01-基础生态/08-推理引擎.md"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "id": "02",
+          "title": "应用生态",
+          "children": [
+            {
+              "type": "file",
+              "id": "01",
+              "title": "应用平台",
+              "file": "大模型讲义/10-模型软硬件生态/02-应用生态/01-应用平台.md"
+            },
+            {
+              "type": "file",
+              "id": "02",
+              "title": "AI编程助手",
+              "file": "大模型讲义/10-模型软硬件生态/02-应用生态/02-AI编程助手.md"
+            },
+            {
+              "type": "file",
+              "id": "03",
+              "title": "ComfyUI",
+              "file": "大模型讲义/10-模型软硬件生态/02-应用生态/03-ComfyUI.md"
+            },
+            {
+              "type": "file",
+              "id": "04",
+              "title": "Data-Juicer",
+              "file": "大模型讲义/10-模型软硬件生态/02-应用生态/04-Data-Juicer.md"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "id": "03",
+          "title": "模型生态",
+          "children": [
+            {
+              "type": "file",
+              "id": "01",
+              "title": "语言模型生态",
+              "file": "大模型讲义/10-模型软硬件生态/03-模型生态/01-语言模型生态.md"
+            },
+            {
+              "type": "file",
+              "id": "02",
+              "title": "视觉生成模型生态",
+              "file": "大模型讲义/10-模型软硬件生态/03-模型生态/02-视觉生成模型生态.md"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "id": "04",
+          "title": "硬件生态与实践",
+          "children": [
+            {
+              "type": "file",
+              "id": "01",
+              "title": "GPU环境配置",
+              "file": "大模型讲义/10-模型软硬件生态/04-硬件生态与实践/01-GPU环境配置.md"
+            },
+            {
+              "type": "file",
+              "id": "02",
+              "title": "昇腾NPU环境",
+              "file": "大模型讲义/10-模型软硬件生态/04-硬件生态与实践/02-昇腾NPU环境.md"
+            },
+            {
+              "type": "file",
+              "id": "03",
+              "title": "沐曦环境",
+              "file": "大模型讲义/10-模型软硬件生态/04-硬件生态与实践/03-沐曦环境.md"
+            },
+            {
+              "type": "file",
+              "id": "04",
+              "title": "AMD-ROCm",
+              "file": "大模型讲义/10-模型软硬件生态/04-硬件生态与实践/04-AMD-ROCm.md"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "title": "模型训练推理技术",
+      "count": 9,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/11-模型训练推理技术/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "Prompt-Engineering",
+          "file": "大模型讲义/11-模型训练推理技术/01-Prompt-Engineering.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "数据集格式与训练阶段",
+          "file": "大模型讲义/11-模型训练推理技术/02-数据集格式与训练阶段.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "训练中的问题",
+          "file": "大模型讲义/11-模型训练推理技术/03-训练中的问题.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "思维链训练",
+          "file": "大模型讲义/11-模型训练推理技术/04-思维链训练.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "模型周边应用",
+          "file": "大模型讲义/11-模型训练推理技术/05-模型周边应用.md"
+        },
+        {
+          "type": "file",
+          "id": "06",
+          "title": "推理加速应用",
+          "file": "大模型讲义/11-模型训练推理技术/06-推理加速应用.md"
+        },
+        {
+          "type": "file",
+          "id": "07",
+          "title": "实践SWIFT训练与Gradio",
+          "file": "大模型讲义/11-模型训练推理技术/07-实践SWIFT训练与Gradio.md"
+        },
+        {
+          "type": "file",
+          "id": "08",
+          "title": "实践自定义训练",
+          "file": "大模型讲义/11-模型训练推理技术/08-实践自定义训练.md"
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "title": "评测技术",
+      "count": 6,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/12-评测技术/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "交叉验证与后评估",
+          "file": "大模型讲义/12-评测技术/01-交叉验证与后评估.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "通用Benchmark",
+          "file": "大模型讲义/12-评测技术/02-通用Benchmark.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "自定义Benchmark",
+          "file": "大模型讲义/12-评测技术/03-自定义Benchmark.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "评测框架",
+          "file": "大模型讲义/12-评测技术/04-评测框架.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "实践EvalScope评估",
+          "file": "大模型讲义/12-评测技术/05-实践EvalScope评估.md"
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "title": "智能体技术",
+      "count": 18,
+      "children": [
+        {
+          "type": "file",
+          "id": "00",
+          "title": "引言",
+          "file": "大模型讲义/13-智能体技术/00-引言.md"
+        },
+        {
+          "type": "file",
+          "id": "01",
+          "title": "智能体发展历史",
+          "file": "大模型讲义/13-智能体技术/01-智能体发展历史.md"
+        },
+        {
+          "type": "file",
+          "id": "02",
+          "title": "代码平台与低代码平台",
+          "file": "大模型讲义/13-智能体技术/02-代码平台与低代码平台.md"
+        },
+        {
+          "type": "file",
+          "id": "03",
+          "title": "ReACT协议",
+          "file": "大模型讲义/13-智能体技术/03-ReACT协议.md"
+        },
+        {
+          "type": "file",
+          "id": "04",
+          "title": "记忆检索与上下文",
+          "file": "大模型讲义/13-智能体技术/04-记忆检索与上下文.md"
+        },
+        {
+          "type": "file",
+          "id": "05",
+          "title": "多智能体体系",
+          "file": "大模型讲义/13-智能体技术/05-多智能体体系.md"
+        },
+        {
+          "type": "file",
+          "id": "06",
+          "title": "Agentic-RL",
+          "file": "大模型讲义/13-智能体技术/06-Agentic-RL.md"
+        },
+        {
+          "type": "file",
+          "id": "07",
+          "title": "OpenAI与Claude协议",
+          "file": "大模型讲义/13-智能体技术/07-OpenAI与Claude协议.md"
+        },
+        {
+          "type": "file",
+          "id": "08",
+          "title": "工具与MCP协议",
+          "file": "大模型讲义/13-智能体技术/08-工具与MCP协议.md"
+        },
+        {
+          "type": "file",
+          "id": "09",
+          "title": "RAG技术",
+          "file": "大模型讲义/13-智能体技术/09-RAG技术.md"
+        },
+        {
+          "type": "file",
+          "id": "10",
+          "title": "Agent框架讲解",
+          "file": "大模型讲义/13-智能体技术/10-Agent框架讲解.md"
+        },
+        {
+          "type": "file",
+          "id": "11",
+          "title": "实践个人生活助手",
+          "file": "大模型讲义/13-智能体技术/11-实践个人生活助手.md"
+        },
+        {
+          "type": "file",
+          "id": "12",
+          "title": "实践MCP-Server",
+          "file": "大模型讲义/13-智能体技术/12-实践MCP-Server.md"
+        },
+        {
+          "type": "file",
+          "id": "13",
+          "title": "实践Code-Agent",
+          "file": "大模型讲义/13-智能体技术/13-实践Code-Agent.md"
+        },
+        {
+          "type": "file",
+          "id": "14",
+          "title": "Skills技术",
+          "file": "大模型讲义/13-智能体技术/14-Skills技术.md"
+        },
+        {
+          "type": "file",
+          "id": "15",
+          "title": "OpenClaw与ACP协议",
+          "file": "大模型讲义/13-智能体技术/15-OpenClaw与ACP协议.md"
+        },
+        {
+          "type": "file",
+          "id": "16",
+          "title": "Harness-Engineering",
+          "file": "大模型讲义/13-智能体技术/16-Harness-Engineering.md"
+        },
+        {
+          "type": "file",
+          "id": "17",
+          "title": "智能体自我进化",
+          "file": "大模型讲义/13-智能体技术/17-智能体自我进化.md"
+        }
+      ]
+    }
+  ]
+}
