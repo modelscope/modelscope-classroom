@@ -1,6 +1,6 @@
 # ModelScope教程
 
-我们的github网站: [LLM讲义](https://modelscope.github.io/modelscope-classroom)
+我们的github网站: [LLM讲义](https://modelscope.github.io/modelscope-classroom)，你现在可以通过网站来浏览知识啦！
 
 ## 🍀介绍
 
