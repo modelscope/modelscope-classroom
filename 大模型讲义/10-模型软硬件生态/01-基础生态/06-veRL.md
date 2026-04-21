@@ -44,10 +44,15 @@ pip install -e .
 
 veRL中的RLHF训练数据流：
 
-```
-Prompt → Actor生成 → Reward评分 → 优势估计 → 策略更新
-              ↓
-        Reference KL约束
+```mermaid
+graph LR
+    A[Prompt] --> B[Actor生成响应]
+    B --> C[Reward Model评分]
+    B --> D[Reference Model计算KL]
+    C --> E[优势估计]
+    D --> E
+    E --> F[策略更新]
+    F --> A
 ```
 
 ### 角色分离

@@ -38,6 +38,21 @@
 
 ## 8.1.2 AlphaFold 2 架构
 
+AlphaFold 2 的整体流程可以概括为以下管线：
+
+```mermaid
+graph LR
+    A[氨基酸序列] --> B[MSA特征提取]
+    A --> C[配对表示初始化]
+    B --> D[Evoformer]
+    C --> D
+    D --> E[Structure Module]
+    E --> F[3D坐标预测]
+    F --> G{循环细化}
+    G -->|反馈| D
+    G -->|收敛| H[最终结构]
+```
+
 ### 输入表示
 
 AlphaFold 2 的输入包含两部分：

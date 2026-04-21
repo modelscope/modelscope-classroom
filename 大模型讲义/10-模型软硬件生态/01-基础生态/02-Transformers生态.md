@@ -62,7 +62,17 @@ model = AutoModel.from_config(config)
 
 ### Pipeline：快速推理
 
-如果你只是想快速验证一个模型的效果，甚至不想写几行代码来处理tokenizer和模型调用，Pipeline就是为你准备的。它把"加载模型→预处理→推理→后处理"打包成一个函数调用：
+如果你只是想快速验证一个模型的效果，甚至不想写几行代码来处理tokenizer和模型调用，Pipeline就是为你准备的。它把“加载模型→预处理→推理→后处理”打包成一个函数调用：
+
+```mermaid
+graph LR
+    A[AutoTokenizer] --> C[Pipeline]
+    B[AutoModel] --> C
+    C --> D[文本预处理]
+    D --> E[模型推理]
+    E --> F[后处理]
+    F --> G[结果输出]
+```
 
 ```python
 from transformers import pipeline

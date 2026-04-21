@@ -27,6 +27,16 @@ pip install "data-juicer[all]"
 
 ## 数据处理流程
 
+```mermaid
+graph LR
+    A[原始数据] --> B[基础清洗]
+    B --> C[格式过滤]
+    C --> D[质量过滤]
+    D --> E[去重]
+    E --> F[最终清洗]
+    F --> G[高质量数据]
+```
+
 ### 配置文件
 
 ```yaml

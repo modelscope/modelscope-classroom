@@ -39,6 +39,18 @@ Q-Learning 的巧妙之处在于：它不需要显式的重要性权重，因为
 
 ### RLHF 的复杂性
 
+```mermaid
+graph LR
+    subgraph "标准 RLHF 流程"
+        SFT["① SFT 监督微调"] --> RM["② 奖励模型训练"]
+        RM --> PPO["③ PPO 在线优化"]
+    end
+    subgraph "DPO 简化流程"
+        SFT2["① SFT 监督微调"] --> DPO["② 直接偏好优化"]
+        PREF["偏好数据"] --> DPO
+    end
+```
+
 标准 RLHF 流程包含三个阶段：
 
 1. **SFT**：监督微调

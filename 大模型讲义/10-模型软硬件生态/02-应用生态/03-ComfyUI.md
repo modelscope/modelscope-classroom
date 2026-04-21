@@ -42,6 +42,20 @@ ComfyUI/
 
 ## 核心节点
 
+下图展示了ComfyUI基础文生图工作流中各节点的连接关系：
+
+```mermaid
+graph TD
+    A[Load Checkpoint] --> B[CLIP Text Encode正向]
+    A --> C[CLIP Text Encode反向]
+    A --> D[Empty Latent Image]
+    B --> E[KSampler]
+    C --> E
+    D --> E
+    E --> F[VAE Decode]
+    F --> G[Save Image]
+```
+
 ### 基础文生图流程
 
 ```

@@ -132,6 +132,26 @@ $$\text{s.t.} \quad \mathbb{E}[D_{\text{KL}}(\pi_{\theta_{\text{old}}} \| \pi_\t
 
 ### 统一框架
 
+```mermaid
+graph TD
+    subgraph "Value-Based"
+        S1["状态 s"] --> QF["学习 Q(s,a)"]
+        QF --> ARGMAX["贪婪选择 argmax"]
+        ARGMAX --> A1["动作 a"]
+    end
+    subgraph "Policy-Based"
+        S2["状态 s"] --> PI["直接输出 π(a|s)"]
+        PI --> SAMPLE["采样"]
+        SAMPLE --> A2["动作 a"]
+    end
+    subgraph "Actor-Critic"
+        S3["状态 s"] --> ACTOR["策略网络 Actor"]
+        S3 --> CRITIC["价值网络 Critic"]
+        ACTOR --> A3["动作 a"]
+        CRITIC -->|"优势估计"| ACTOR
+    end
+```
+
 **Actor-Critic** 结合了两类方法的优势：
 
 - **Actor**（策略网络）：$\pi_\theta(a|s)$，policy-based

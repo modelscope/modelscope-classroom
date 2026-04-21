@@ -36,6 +36,21 @@ $$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\fr
 2. 将 $\mathbf{k}_{t+1}, \mathbf{v}_{t+1}$ 追加到 Cache
 3. 用 $\mathbf{q}_{t+1}$ 与缓存的 $\mathbf{K}_{1:t+1}, \mathbf{V}_{1:t+1}$ 计算注意力
 
+```mermaid
+graph LR
+    subgraph 首次计算
+        A[Prompt Tokens] --> B[计算K,V]
+        B --> C[存入KV Cache]
+    end
+    subgraph 后续生成
+        D[新Token] --> E[仅计算新K,V]
+        E --> F[追加到Cache]
+        F --> G[与全部K,V做注意力]
+        G --> H[输出]
+    end
+    C --> G
+```
+
 ## 6.2.2 KV Cache 的实现
 
 ### 数据结构
@@ -168,6 +183,22 @@ $$\mathbf{K}_{\text{cache}} = \mathbf{K}_{t-W+1:t}$$
 2. 后续请求直接复用，跳过前缀的 Prefill
 
 这在多轮对话和批量处理中非常有效。
+
+```mermaid
+graph TD
+    subgraph MHA
+        A1[64个Q头] --> A2[64个KV头]
+        A2 --> A3[KV Cache: 64份]
+    end
+    subgraph GQA
+        B1[64个Q头] --> B2[8个KV头]
+        B2 --> B3[KV Cache: 8份]
+    end
+    subgraph MQA
+        C1[64个Q头] --> C2[1个KV头]
+        C2 --> C3[KV Cache: 1份]
+    end
+```
 
 ## 6.2.5 Multi-Query 与 Grouped-Query Attention
 

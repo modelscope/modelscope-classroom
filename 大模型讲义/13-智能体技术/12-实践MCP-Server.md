@@ -2,6 +2,20 @@
 
 前面在工具与 MCP 协议一节中，我们用“大厨与厨具供应商”的比喻理解了 MCP 的架构。现在我们换一个角色——这次你不是大厨，而是厨具供应商。你要按照 MCP 规范制作一套工具，让任何支持 MCP 的智能体都能直接使用。本节将实现一个提供文件操作和命令执行功能的完整 MCP Server。
 
+```mermaid
+sequenceDiagram
+    participant C as Client请求
+    participant T as Transport层<br>stdio/HTTP
+    participant S as Server路由
+    participant H as Handler处理
+    C->>T: JSON-RPC 请求
+    T->>S: 解析并分发
+    S->>H: 调用对应处理器
+    H-->>S: 执行结果
+    S-->>T: 封装响应
+    T-->>C: 返回结果
+```
+
 ## 项目目标
 
 构建一个本地文件系统操作的MCP Server，支持：

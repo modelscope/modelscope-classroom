@@ -47,6 +47,17 @@ print(estimate_memory(7))
 
 ## 驱动与CUDA安装
 
+GPU环境的软件依赖栈从底层到上层如下：
+
+```mermaid
+graph TD
+    A[NVIDIA驱动] --> B[CUDA Toolkit]
+    B --> C[cuDNN]
+    C --> D[PyTorch]
+    D --> E[Transformers / 训练框架]
+    E --> F[应用代码]
+```
+
 ### 驱动安装
 
 ```bash

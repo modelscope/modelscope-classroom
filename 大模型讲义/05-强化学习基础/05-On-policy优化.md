@@ -51,6 +51,19 @@ $$L(\theta, \phi) = L^{\text{CLIP}}(\theta) - c_1 L^{\text{VF}}(\phi) + c_2 S[\p
 
 ### PPO 在 RLHF 中的应用
 
+```mermaid
+graph TD
+    P["提示词 prompt x"] --> GEN["策略 πθ 生成回复 y"]
+    GEN --> RM["奖励模型 R(x,y)"]
+    RM --> GAE["计算优势 (Critic + GAE)"]
+    GEN --> RATIO["重要性比率 rₜ(θ)"]
+    GAE --> CLIP["裁剪目标函数"]
+    RATIO --> CLIP
+    CLIP --> UPDATE["更新策略参数"]
+    REF["参考策略 π_ref"] --> KL["KL 惩罚"]
+    KL --> RM
+```
+
 在 LLM 的 RLHF 中：
 
 1. **采样**：给定 prompt $x$，用 $\pi_\theta$ 生成回复 $y$
@@ -77,6 +90,16 @@ PPO 需要训练 Critic 网络，增加了复杂度。能否绕过 Critic？
 举个例子。假设老师出了一道作文题，让全班 16 个同学都写一篇。传统 PPO 的做法是请一位"评分专家"（Critic）给每篇作文估算分数。GRPO 的做法更简单粗暴：直接看这 16 篇作文的打分排名，高于平均的就是"好"，低于平均的就是"差"。不需要专门的评分专家，同学之间互相比较就够了。
 
 ### 算法设计
+
+```mermaid
+graph TD
+    X["提示词 x"] --> SAMPLE["采样 G 个回复"]
+    SAMPLE --> Y1["y₁"] & Y2["y₂"] & YG["yₓ"]
+    Y1 & Y2 & YG --> RM["奖励模型打分"]
+    RM --> NORM["组内标准化"]
+    NORM --> ADV["相对优势 Āᵢ"]
+    ADV --> UPDATE["裁剪目标更新"]
+```
 
 给定 prompt $x$，采样 $G$ 个回复 $\{y_1, \ldots, y_G\}$，用奖励模型打分 $\{r_1, \ldots, r_G\}$。
 

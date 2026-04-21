@@ -8,6 +8,19 @@ Megatron是NVIDIA开发的大规模语言模型训练框架，专为高效利用
 
 Megatron最初由NVIDIA发布用于训练GPT系列模型，后与DeepSpeed结合形成了Megatron-DeepSpeed，在工业界大模型训练中广泛应用。
 
+```mermaid
+graph TD
+    A[总 GPU 数量] --> B[张量并行 TP]
+    A --> C[流水线并行 PP]
+    A --> D[数据并行 DP]
+    B --> E[层内权重切分]
+    C --> F[层间划分到不同GPU]
+    D --> G[数据切分到各副本]
+    E --> H[GPU数 = TP × PP × DP]
+    F --> H
+    G --> H
+```
+
 **核心特性**：
 - 高效的张量并行实现
 - 流水线并行与交错调度

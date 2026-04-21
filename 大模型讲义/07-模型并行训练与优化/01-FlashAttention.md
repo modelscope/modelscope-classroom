@@ -44,6 +44,17 @@ Flash Attention 的核心思想是**分块计算**（Tiling）——回到读书
 4. 将结果增量写回 HBM（显存，相当于书架）
 5. **不存储完整的** $\mathbf{S}$ **和** $\mathbf{P}$——省去了「把整本书摆在桌上」的开销
 
+```mermaid
+graph TD
+    A[分块Q/K/V] --> B[从 HBM 加载块到 SRAM]
+    B --> C[在 SRAM 中计算注意力]
+    C --> D[在线 Softmax 更新]
+    D --> E[累积输出写回 HBM]
+    E --> F{还有下一块?}
+    F -->|是| B
+    F -->|否| G[最终输出 O]
+```
+
 ### 在线 Softmax
 
 分块计算 softmax 的难点：softmax 需要全局归一化，但我们不想存储完整的 $\mathbf{S}$。
@@ -108,6 +119,20 @@ for j in range(0, N, B_c):  # Key/Value 块
 - Flash Attention：$O(N^2 d^2 / M)$，其中 $M$ 是 SRAM 大小
 
 当 $M$ 足够大时，Flash Attention 的 HBM 访问量显著减少。
+
+```mermaid
+graph LR
+    subgraph 标准注意力
+        SA1[Q,K,V] --> SA2["存储S: O(N²)"]
+        SA2 --> SA3["存储P: O(N²)"]
+        SA3 --> SA4[输出 O]
+    end
+    subgraph Flash Attention
+        FA1[Q,K,V] --> FA2[分块加载到SRAM]
+        FA2 --> FA3[计算+在线Softmax]
+        FA3 --> FA4["只存储O,m,l: O(N)"]
+    end
+```
 
 ## 7.1.3 Flash Attention 2
 

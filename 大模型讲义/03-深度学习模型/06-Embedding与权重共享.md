@@ -100,6 +100,16 @@ $$\text{softmax}(\mathbf{z})_i = \frac{\exp(z_i - \max_j z_j)}{\sum_{j=1}^V \exp
 
 ## 3.6.4 权重共享（Tied Embeddings）
 
+```mermaid
+graph LR
+    A[Token ID] --> B["嵌入矩阵 E (V×d)"]
+    B --> C[向量表示]
+    C --> D[Transformer 层]
+    D --> E[隐藏状态 h]
+    E --> F["输出矩阵 W_o = E"]
+    F --> G[Softmax 概率]
+```
+
 ### 输入-输出权重共享
 
 **权重共享**（Weight Tying）指让输入嵌入矩阵 $\mathbf{E}$ 和输出权重矩阵 $\mathbf{W}_o$ 共享参数：

@@ -28,6 +28,17 @@ CLIP 的核心洞察是：与其将图像映射到固定的标签空间，不如
 
 ## 3.3.2 CLIP 架构
 
+```mermaid
+graph TD
+    A[图像] --> B[图像编码器 ViT/ResNet]
+    C[文本] --> D[文本编码器 Transformer]
+    B --> E[图像向量 v]
+    D --> F[文本向量 u]
+    E --> G[共享语义空间]
+    F --> G
+    G --> H[对比损失 InfoNCE]
+```
+
 CLIP 由两个独立的编码器组成：
 
 ### 图像编码器

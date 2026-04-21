@@ -91,6 +91,24 @@ add_kernel[grid](x, y, output, n_elements, BLOCK_SIZE=1024)
 2. **减少显存访问**：中间结果保持在寄存器/共享内存，不用「放回冰箱再取出」
 3. **提高算术强度**：计算/访存比提升
 
+```mermaid
+graph LR
+    subgraph 未融合
+        A1[读取x] --> A2["kernel1: x*scale"]
+        A2 --> A3[写回显存]
+        A3 --> A4[读取y]
+        A4 --> A5["kernel2: y+bias"]
+        A5 --> A6[写回显存]
+        A6 --> A7[读取y]
+        A7 --> A8["kernel3: gelu(y)"]
+        A8 --> A9[写回显存]
+    end
+    subgraph 融合后
+        B1[读取x] --> B2["单kernel: gelu(x*scale+bias)"]
+        B2 --> B3[写回显存]
+    end
+```
+
 ### 融合示例
 
 未融合：

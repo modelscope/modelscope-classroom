@@ -10,6 +10,22 @@
 
 OpenAI的Function Calling允许模型识别何时需要调用外部函数，并生成符合函数签名的结构化参数。简单来说，就是你告诉模型“你有哪些工具可以用”，然后它会自己判断什么时候该用哪个工具、怎么填参数。
 
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant C as Client
+    participant API as LLM API
+    participant T as 工具/函数
+    U->>C: 发送请求
+    C->>API: messages + tools 定义
+    API-->>C: tool_calls 响应
+    C->>T: 执行函数调用
+    T-->>C: 返回结果
+    C->>API: 携带 tool 结果继续对话
+    API-->>C: 最终回答
+    C-->>U: 展示结果
+```
+
 ### API格式
 
 ```python

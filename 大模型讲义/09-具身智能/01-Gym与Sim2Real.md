@@ -8,6 +8,13 @@
 
 OpenAI Gym（现由Farama Foundation维护，更名为Gymnasium）确立了强化学习环境的标准接口。其核心抽象极为简洁，本质上就是两个动作的循环：智能体观察环境→做出决策→环境反馈结果→智能体再观察……这就像飞行模拟器的工作流程：飞行员看仪表盘（观察），拉操纵杆（动作），模拟器给出飞机的新状态（转移）：
 
+```mermaid
+graph LR
+    A[agent.act] -->|动作| B[env.step]
+    B -->|观测, 奖励, done| C[agent.learn]
+    C -->|更新策略| A
+```
+
 ```python
 import gymnasium as gym
 
@@ -186,6 +193,15 @@ root_states = gymtorch.wrap_tensor(gym.acquire_actor_root_state_tensor(sim))
 | CARLA | 自动驾驶仿真 | 车辆控制 |
 
 ## Sim-to-Real迁移技术
+
+```mermaid
+graph LR
+    A[仿真环境训练] --> B[域随机化]
+    B --> C[策略鲁棒性提升]
+    C --> D[迁移与微调]
+    D --> E[真实环境部署]
+    E -->|反馈| A
+```
 
 ### Reality Gap分析
 

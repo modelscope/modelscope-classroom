@@ -88,6 +88,22 @@ MCP（Model Context Protocol）旨在解决以下问题：
 3. **安全性**：提供权限控制和沙箱执行
 4. **可组合性**：支持工具的组合和编排
 
+```mermaid
+sequenceDiagram
+    participant H as Host应用
+    participant C as MCP Client
+    participant S as MCP Server
+    participant T as 工具执行
+    H->>C: 用户请求
+    C->>S: tools/list
+    S-->>C: 返回工具列表
+    C->>S: tools/call
+    S->>T: 执行工具
+    T-->>S: 返回结果
+    S-->>C: JSON-RPC 响应
+    C-->>H: 展示结果
+```
+
 ### 核心概念
 
 ```

@@ -555,6 +555,23 @@ class ContaminationGuard:
 
 ## 完整评测集构建流程
 
+下图展示了构建自定义Benchmark的完整流程：
+
+```mermaid
+graph TD
+    A[需求分析] --> B[数据收集]
+    B --> B1[生产日志提取]
+    B --> B2[专家标注]
+    B --> B3[合成数据生成]
+    B1 --> C[数据清洗与去重]
+    B2 --> C
+    B3 --> C
+    C --> D[质量筛选与难度标注]
+    D --> E[平衡采样]
+    E --> F[标注验证]
+    F --> G[版本发布]
+```
+
 ```python
 def build_custom_benchmark(config):
     """构建自定义评测集的完整流程"""
