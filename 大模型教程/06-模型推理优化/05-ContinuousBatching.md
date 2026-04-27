@@ -40,7 +40,7 @@ graph TD
 **等待浪费**：批内请求的输出长度参差不齐，短请求先结束却必须等最长的请求完成——如同团建活动里跑最快的人必须在终点等最慢的人到齐才能开始下一环。
 
 示例：
-```
+```text
 请求 1: 输出 50 tokens，耗时 5s
 请求 2: 输出 500 tokens，耗时 50s
 请求 3: 输出 100 tokens，耗时 10s
@@ -48,7 +48,7 @@ graph TD
 静态批处理：必须等 50s，请求 1、3 的 GPU 利用率极低
 ```
 
-**Padding 浪费**：长度对齐需要 padding，填充部分做无用计算。
+**Padding 浪费**：长度对齐需要 padding，填充部分产生无效的注意力计算开销。
 
 **延迟尖峰**：批次边界造成等待，新请求的延迟取决于批内最慢的请求。
 
@@ -77,7 +77,7 @@ $$\text{利用率} = \frac{\text{平均长度}}{\text{最大长度}} = \frac{(L_
 
 ### 调度流程
 
-```
+```text
 迭代 1: [Req1, Req2, Req3] → 生成 token → Req1 结束
 迭代 2: [Req2, Req3, Req4] → 加入新请求 Req4，生成 token
 迭代 3: [Req2, Req3, Req4] → 生成 token → Req3 结束
@@ -123,7 +123,7 @@ Continuous Batching 需要处理两类请求：
 
 结合 Chunked Prefill，可以将长 Prefill 分块，与 Decode 请求混合：
 
-```
+```text
 迭代 1: [Decode: Req1, Req2] + [Prefill Chunk: Req3_part1]
 迭代 2: [Decode: Req1, Req2] + [Prefill Chunk: Req3_part2]
 迭代 3: [Decode: Req1, Req2, Req3] → Req3 Prefill 完成，加入 Decode
