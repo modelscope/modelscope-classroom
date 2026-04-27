@@ -144,7 +144,7 @@ $$\text{KV Cache} = 2 \times L \times B \times n \times d \times \text{sizeof(dt
 
 以 LLaMA-70B 为例（$L=80$，$d=8192$，$n=4096$，$B=1$，FP16）：
 
-$$2 \times 80 \times 1 \times 4096 \times 8192 \times 2 \text{ bytes} = 10.7 \text{ GB}$$
+$$2 \times 80 \times 1 \times 4096 \times 8192 \times 2 \text{ bytes} = 10{,}737{,}418{,}240 \text{ bytes} \approx 10.7 \text{ GB}$$
 
 **单个请求的 KV Cache 就占用 10.7GB**！这是 LLM 推理显存紧张的主要原因。
 
@@ -281,7 +281,7 @@ GQA 在质量和效率之间取得了很好的平衡，被 LLaMA-2、Mistral 等
 
 动态分配会导致内存碎片：
 
-```
+```text
 |--KV1--|    |--KV2--|      |--KV3--|
         ^空隙^        ^空隙^
 ```
